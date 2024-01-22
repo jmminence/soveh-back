@@ -1,0 +1,40 @@
+<fieldset>
+  <div id="step_{{ step_tab }}">
+    <input type="hidden" id="step_id" name="step_id" value="{{step_id}}">
+    <input type="hidden" id="step_tag" name="step_tag" value="{{step_tag}}">
+    <input type="hidden" id="form_id" name="form_id" value="{{form_id}}" >
+    <input type="hidden" id="analysis_id" name="analysis_id" value="{{analysis_id}}" >
+    <h4 class="form-section">
+      <i class="ft-user"></i> Guardado Muestras
+    </h4>
+    <div id="store_group">
+      <table id="store_table" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Muestras</th>
+            <th>Corte</th>
+            <th>Identificación Caja</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        </table>
+    </div>
+  </div>
+</fieldset>
+
+
+<script id="store_row" type="text/x-lodash-template">
+  <tr data-index="<%= store_index %>">
+    <td>
+      <%= samples %>
+    </td>
+    <td>
+      <%= slice_name %>
+      <input type="hidden" name="store[slice_id][<%= store_index %>]" value="<%= slice_id %>" >
+    </td>
+    <td>
+      <input name="store[box_id][<%= store_index %>]" class="form-control" value="<%= box_id %>" {% if not edit %}disabled{% endif %}>
+    </td>
+  </tr>
+</script>

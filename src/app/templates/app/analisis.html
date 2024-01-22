@@ -1,0 +1,125 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content_header%}
+<div class="content-header row">
+  <div class="content-header-left col-md-6 col-12 mb-2">
+    <h3 class="content-header-title mb-0">Análisis</h3>
+    <div class="row breadcrumbs-top">
+      <div class="breadcrumb-wrapper col-12">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="index.html">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="#">Administración</a>
+          </li>
+          <li class="breadcrumb-item active">Análisis
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="content-header-right col-md-6 col-12">
+    <div role="group" class="btn-group float-md-right">
+      <button id="btnGroup" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#new_exam">
+        <i class="ft-settings"></i> Nuevo Análisis</button>
+    </div>
+  </div>
+</div>
+{% endblock content_header %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">Listado de Análisis</h4>
+      </div>
+      <div class="card-content">
+        <div class="card-body card-dashboard">
+          <table class="table table-striped table-bordered zero-configuration">
+            <thead>
+              <tr>
+                <th>Codigo</th>
+                <th>Nombre</th>
+                <th>Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for exam in exam_list %}
+              <tr>
+                <td>{{ exam.id }}</td>
+                <td>{{ exam.name }}</td>
+                <td></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade text-left" id="new_exam" tabindex="-1" role="dialog" aria-labelledby="myModalLabel35" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="myModalLabel35">Nuevo Análisis</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="nuevo_analisis">
+        <div class="modal-body">
+          <fieldset class="form-group floating-label-form-group">
+            <label for="name">Nombre</label>
+            <input type="text" class="form-control" id="nombre" placeholder="Nombre del Análisis">
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <input type="reset" class="btn btn-secondary" data-dismiss="modal" value="Cerrar">
+          <input type="submit" class="btn btn-primary" value="Guardar" id="save">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock content %} {% block scripts %}
+<script type="text/javascript">
+
+  $("#save").on('click', function (e) {
+    e.preventDefault();
+    var url = Urls.exam();
+
+    var nombre = $("#nombre").val();
+
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: {
+        nombre: nombre,
+        rut: rut,
+        laboratorio: laboratorio
+      }
+    })
+      .done(function () {
+        location.reload();
+      })
+      .fail(function () {
+        console.log("Fail")
+      })
+  })
+
+  $(document).ready(function () {
+    $('.zero-configuration').DataTable({
+      "oLanguage": {
+        "sUrl": "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json"
+      }
+    });
+  });
+
+</script> {% endblock scripts %}

@@ -1,0 +1,109 @@
+<fieldset>
+  <div id="step_{{ step_tab }}">
+
+    <input type="hidden" id="step_id" name="step_id" value="{{step_id}}">
+    <input type="hidden" id="step_tag" name="step_tag" value="{{step_tag}}">
+    <input type="hidden" id="form_id" name="form_id" value="{{form_id}}" >
+    <input type="hidden" id="form_parent_id" name="form_parent_id" value="{{form_parent_id}}" >
+    <input type="hidden" id="analysis_id" name="analysis_id" value="{{analysis_id}}" >
+
+    <h4 class="form-section">
+      <i class="ft-user"></i> Hallazgos
+    </h4>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="float-right pr-2">
+          <a class="btn btn-outline-secondary round btn-lg" role="button" href="/preview-report/{{form_id}}"><i class="fa fa-eye fa-fx"></i> Vista previa informe</a>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="table-responsive">
+          <table id="diagnostic_table" class="table table-condensed table-bordered" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <thead>
+              <tr>
+                <th>No. Muestra</th>
+                <th>Identificación</th>
+                <th>Corte</th>
+                <th>Organos</th>
+                <th><center>No. hallazgos</center></th>
+                {% if edit %}
+                  <th><center>Opciónes hallazgos</center></th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>  
+      </div>
+    </div>
+  
+    
+   
+  </div>
+</fieldset>
+
+
+<script id="diagnostic_row" type="text/x-lodash-template">
+  <tr data-index="<%= store_index %>">
+    <td>
+      <%= sample_index %>
+    </td>
+    <td>
+      <%= sample_identification %>
+    </td>
+    <td>
+      <%= slice_name %>
+    </td>
+    <td>
+      <% _.each( organs, function( organ ){ %>
+        <%= organ.name %>,
+      <% }); %>
+    </td>
+    <td>
+      <center>
+        <div class="badge bg-blue-grey badge-lg round paths_count">
+          <strong><%= paths %></strong>
+        </div>
+      </center>
+    </td>
+    {% if edit %}
+      <td class="text-center">
+        <a title="Agregar nuevo hallazgo" id="new_pathology_link" data-sample-id="<%= sample_id %>" data-slice-id="<%= slice_id %>" <i class="fa fa-plus fa-fw fa-2x"></i></a>
+        <a title="Editar hallazgos" id="show_pathology_link" data-slice-id="<%= slice_id %>" <i class="fa fa-edit fa-fw fa-2x"></i></a>
+      </td>
+    {% endif %}
+  </tr>
+</script>
+
+<script id="pathology_row" type="text/x-lodash-template">
+  <tr>
+    <td>
+      <%= organ %>
+    </td>
+    <td>
+      <%= organ_location %>
+    </td>
+    <td>
+      <%= pathology %>
+    </td>
+    <td>
+      <%= diagnostic %>
+    </td>
+    <td>
+      <%= diagnostic_distribution %>
+    </td>
+    <td>
+      <%= diagnostic_intensity %>
+    </td>
+    <td id="image-box-<%= report_id %>">
+      <% _.each( images, function( img ){ %>
+        <a target="_blank" href="<%= img.url %>"> <%= img.name %></a></br>
+      <% }); %>
+    </td>
+    <td class="text-center">
+      <a title="Eliminar hallazgo" id="remove_pathology" data-report-id="<%= report_id %>" <i class="fa fa-trash fa-fw fa-2x"></i></a>
+      <a title="Cargar Imágen" id="load_img" data-id="<%= report_id %>" <i class="fa fa-upload fa-fw fa-2x"></i></a>
+    </td>
+  </tr>
+</script>

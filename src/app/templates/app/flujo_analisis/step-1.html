@@ -1,0 +1,59 @@
+<fieldset>
+    <div id="step_{{ step_tab }}">
+      <input type="hidden" id="step_id" name="step_id" value="{{step_id}}">
+      <input type="hidden" id="step_tag" name="step_tag" value="{{step_tag}}">
+      <input type="hidden" id="form_id" name="form_id" value="{{form_id}}" >
+      <input type="hidden" id="analysis_id" name="analysis_id" value="{{analysis_id}}" >
+      <h4 class="form-section">
+        <i class="ft-user"></i> Tinción
+      </h4>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-md-12 text-right m-1">
+          {% if edit %}
+            <button type="button" id="saveTimingStep1" class="btn btn-warning square"><i class="fa fa-save"></i> Guardar Cambios</button>
+          {% endif %}
+        </div>
+        <div class="table-responsive">
+          <table id="stain_table" class="table table-condensed table-bordered" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <thead>
+              <tr>
+                <th>Muestras</th>
+                <th>Corte</th>
+                <th>Inicio Tinción <br> <span class="btn btn-sm btn-success square start_stain_all"><i class="fa fa-check-square-o"></i> Todos</span></th>
+                <th>Fin Tinción <br> <span class="btn btn-sm btn-success square end_stain_all"><i class="fa fa-check-square-o"></i> Todos</span></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+
+  <script id="stain_row" type="text/x-lodash-template">
+    <tr data-index="<%= stain_index %>">
+      <td>
+        <%= samples %>
+      </td>
+      <td>
+        <%= slice_name %>
+        <input type="hidden" name="stain_slice_id_<%= stain_index %>" value="<%= slice_id %>" >
+      </td>
+      <td>
+        <input type="checkbox" id="stain_start_stain_<%= stain_index %>" class="switchery" />
+        <input type="hidden" name="stain_start_stain_<%= stain_index %>" value="<%= start_stain %>" />
+      </td>
+      <td>
+        <input type="checkbox" id="stain_end_stain_<%= stain_index %>" class="switchery" />
+        <input type="hidden" name="stain_end_stain_<%= stain_index %>" value="<%= end_stain %>" />
+      </td>
+    </tr>
+  </script>
