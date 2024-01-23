@@ -5335,7 +5335,6 @@ def consolidadoScoreGill(form_id):
         
     
     for sample in range(len(samples)):
-        print (samples[sample].identification.id)
         try:
             if samples[sample].identification.id != samples[sample+1].identification.id:
                 list_empty[f"sample_{samples[sample].id}"] = samples[sample]
@@ -5358,13 +5357,25 @@ def consolidadoScoreGill(form_id):
         
     identifications = Identification.objects.filter(entryform__id=analysis.entryform.id)
 
+    test2 = []
+
+    sampleexamresults = SampleExamResult.objects.filter(analysis__id=form_id)
+    for sampleexamresult in sampleexamresults:
+        test = {
+            "value": sampleexamresult.value,
+            "sample_id": sampleexamresult.sample_exam.sample.id,
+            "result": sampleexamresult.result_organ.result.name,
+        }
+        test2.append(test)
+
+
+
     context["analysis"] = analysis
     context["samples"] = list_empty
     context["identifications"] = identifications
     context["entryform"] = entryForm
-    
-    print(context)
-    
+    context["sampleexamresults"] = test2
+    print(context["sampleexamresults"])
 
     route = "app/consolidados/consolidado_SG/consolidado_sg.html" 
     return context, route

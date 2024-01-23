@@ -271,7 +271,7 @@
                                 <td style="background-color: #B0C4DE" class="wide-cell"><input class="form-control" style="background-color: #B0C4DE" type="number" value="0" readonly></td>
                                 {% else %}
                                 <th>{{value.identification.cage}} ({{value.index}})</th>
-                                <td style="background-color: #ceb697"><input class="form-control" style="background-color: #ceb697" type="number" min="0" max="3" value="0" name="{{value.id}}-Hiperplasia Lamelar"></td>
+                                <td style="background-color: #ceb697"><input id="{{value.id}}-Hiperplasia Lamelar" class="form-control" style="background-color: #ceb697" type="number" min="0" max="3" value="0" name="{{value.id}}-Hiperplasia Lamelar"></td>
                                 <td style="background-color: #ceb697"><input class="form-control" style="background-color: #ceb697" type="number" min="0" max="3" value="0" name="{{value.id}}-Fusión lamelar"></td>
                                 <td style="background-color: #ceb697"><input class="form-control" style="background-color: #ceb697" type="number" min="0" max="3" value="0" name="{{value.id}}-Espongeosis"></td>
                                 <td style="background-color: #ceb697"><input class="form-control" style="background-color: #ceb697" type="number" min="0" max="3" value="0" name="{{value.id}}-Necrosis"></td>
@@ -312,6 +312,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript"src="{% static '/app/consolidados/consolidados_sg.js' %}" defer></script>
+{% autoescape off %}
 
+<script>
+    var sampleexamresults={{sampleexamresults}}
 
+    $(document).ready(function () {
+        if(sampleexamresults.length>0){
+            load(sampleexamresults)
+        }
+    });
+</script>
+{% endautoescape %}
 {% endblock scripts%}

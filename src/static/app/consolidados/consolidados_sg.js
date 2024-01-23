@@ -1,5 +1,4 @@
 // Agregar names a los inpur y select del formulario
-
 document.getElementById("dataForm").addEventListener("submit", function (e) {
     e.preventDefault();
     console.log(e)
@@ -55,5 +54,15 @@ function save_sg(event) {
   }
 }
 
-// Tarea para la proxima clase
-// Agregar names y enviar datos al backend (AYUDA: mirar funcion save de consolidado.js)
+
+// Arreglar id bug
+// mostrar valores guardados
+function load(sampleexamresults) {
+  sampleexamresults.forEach(function (sampleexamresult) {
+    console.log(sampleexamresult.sample_id)
+    console.log(sampleexamresult.result)
+    var input = document.getElementById(`${sampleexamresult.sample_id}-${sampleexamresult.result}`);
+    input.value = sampleexamresult.value; //ej.
+    console.log(input)
+  });
+}
