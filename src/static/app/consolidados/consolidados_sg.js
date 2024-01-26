@@ -1,7 +1,6 @@
 // Agregar names a los inpur y select del formulario
 document.getElementById("dataForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    console.log(e)
     var dataForm = new FormData(document.getElementById("dataForm"));
     //var selectValue = dataForm.get('45971-Hiperplasia Lamelar');
     //console.log(selectValue)
@@ -16,12 +15,24 @@ function save_sg(event) {
   const myFormData = new FormData(event.target);
 
   const data = {};
+  optionalmarselected = ""
   myFormData.forEach(function (value, key) {
+    if (key == "mar_opcional") {
+      optionalmarselected = value;
+    }
+
+    if (key.includes("optionmar")){
+      option_diagnostic = key.split("-")
+      option_diagnostic[1] = optionalmarselected
+      key = option_diagnostic.join("-")
+    }
+
     if (value != "") {
       data[key] = value;
     } else {
       return (clear = false);
     }
+
   });
 
   if (clear) {
@@ -59,10 +70,15 @@ function save_sg(event) {
 // mostrar valores guardados
 function load(sampleexamresults) {
   sampleexamresults.forEach(function (sampleexamresult) {
-    console.log(sampleexamresult.sample_id)
-    console.log(sampleexamresult.result)
+    console.log(sampleexamresult)
     var input = document.getElementById(`${sampleexamresult.sample_id}-${sampleexamresult.result}`);
-    input.value = sampleexamresult.value; //ej.
+    if(input==null){
+      console.log("test")
+      input = document.getElementsByName(`${sampleexamresult.sample_id}-optionmar`);
+      console.log(input)
+    }
     console.log(input)
+    input.value = sampleexamresult.value; //ej.
+
   });
 }

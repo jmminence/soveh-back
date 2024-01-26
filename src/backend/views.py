@@ -5368,14 +5368,17 @@ def consolidadoScoreGill(form_id):
         }
         test2.append(test)
 
+    analysisoptionalresult = AnalysisOptionalResult.objects.filter(analysis__id=form_id)[0]
+    result_name = analysisoptionalresult.result.name
+    
 
-
+    context["result_name"] = result_name
     context["analysis"] = analysis
     context["samples"] = list_empty
     context["identifications"] = identifications
     context["entryform"] = entryForm
     context["sampleexamresults"] = test2
-    print(context["sampleexamresults"])
+    print(context["result_name"])
 
     route = "app/consolidados/consolidado_SG/consolidado_sg.html" 
     return context, route
@@ -5392,8 +5395,8 @@ def saveConsolidadoScoreGill(request, form_id):
             print(keys)
 
             if keys[0] == "mar_opcional":
-                mar_opcional = value
-                result = Result.objects.get(id=value)
+                print(value)
+                result = Result.objects.get(name=value, type_result__id__in=[3,4,5,6,7])
                 analysisresult = AnalysisOptionalResult.objects.update_or_create(analysis=analysis, defaults={'result': result})
             else:
                 sample_exam = SampleExams.objects.get(sample__id=keys[0], organ__id=51, exam=analysis.exam, stain=analysis.stain)
