@@ -68,17 +68,54 @@ function save_sg(event) {
 
 // Arreglar id bug
 // mostrar valores guardados
-function load(sampleexamresults) {
+function load(sampleexamresults, result_name) {
+  var select_result = document.getElementsByName("mar_opcional")[0];
+  select_result.value = result_name
+
   sampleexamresults.forEach(function (sampleexamresult) {
-    console.log(sampleexamresult)
     var input = document.getElementById(`${sampleexamresult.sample_id}-${sampleexamresult.result}`);
     if(input==null){
-      console.log("test")
-      input = document.getElementsByName(`${sampleexamresult.sample_id}-optionmar`);
-      console.log(input)
+      input = document.getElementsByName(`${sampleexamresult.sample_id}-optionmar`)[0];
     }
-    console.log(input)
-    input.value = sampleexamresult.value; //ej.
-
+    input.value = sampleexamresult.value;
   });
 }
+
+function anormalidades_celulares(samples){
+  samples.forEach(function (sample) {
+    anormalidadescelulares = document.getElementById(`${sample[1].id}-Anormalidades celulares`);
+    dependencias = Array.from(document.getElementsByClassName(`${sample[1].id}-anormalidades_celulares`));
+    
+    dependencias.forEach(function (dependencia) {
+      dependencia.addEventListener("change", function () {
+        valor = 0
+        anormalidadescelulares2 = document.getElementById(`${sample[1].id}-Anormalidades celulares`);
+        dependencias2 = Array.from(document.getElementsByClassName(`${sample[1].id}-anormalidades_celulares`));
+        dependencias2.forEach(function (dependencia) {
+          if (dependencia.value > valor){
+            valor = dependencia.value
+          }
+        });
+        anormalidadescelulares2.value = valor
+      });
+    });
+  });
+}
+
+function promedio_identifications(identifications){
+  identifications.forEach(function (identification) {
+    console.log(identification)
+    identification_promedios = document.getElementsByClassName(`${identification.id}-promedio`);
+    Array.from(identification_promedios).forEach(function (identification_promedio) {
+      table = document.getElementById("asdasd");
+      var row = table.rows[0];
+      var columns = row.cells;
+      for (var i = 0; i < columns.length; i++) {
+          console.log(columns[i]);
+      }
+    });
+  });
+}
+
+// paso 1 crear funcion para sacar promedio
+//paso 2 ejecutar la funcion cuando se carga la pagina y cuando se cambia el valor de los input

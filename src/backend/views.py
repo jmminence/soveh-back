@@ -5337,18 +5337,45 @@ def consolidadoScoreGill(form_id):
     for sample in range(len(samples)):
         try:
             if samples[sample].identification.id != samples[sample+1].identification.id:
-                list_empty[f"sample_{samples[sample].id}"] = samples[sample]
+                list_empty[f"sample_{samples[sample].id}"] = {
+                    "id": samples[sample].id,
+                    "index": samples[sample].index,
+                    "identification": {
+                            "id": samples[sample].identification.id,
+                            "cage": samples[sample].identification.cage,
+                        }
+                }
+                
                 prom={
-                    "identification":samples[sample].identification,
-                    "test":"test_value",
+                    "identification": {
+                            "id": samples[sample].identification.id,
+                            "cage": samples[sample].identification.cage,
+                        }
                 }
                 list_empty[f"promedio_identification_{samples[sample].identification.id}"] = prom
             else:
-                list_empty[f"sample_{samples[sample].id}"] = samples[sample]
+                list_empty[f"sample_{samples[sample].id}"] = {
+                    "id": samples[sample].id,
+                    "index": samples[sample].index,
+                    "identification": {
+                            "id": samples[sample].identification.id,
+                            "cage": samples[sample].identification.cage,
+                        }
+                }
         except:
-            list_empty[f"sample_{samples[sample].id}"] = samples[sample]
+            list_empty[f"sample_{samples[sample].id}"] = {
+                    "id": samples[sample].id,
+                    "index": samples[sample].index,
+                    "identification": {
+                            "id": samples[sample].identification.id,
+                            "cage": samples[sample].identification.cage,
+                        }
+                }
             list_empty[f"promedio_identification_{samples[sample].identification.id}"] = {
-                "identification":samples[sample].identification,
+                "identification":{
+                    "id": samples[sample].identification.id,
+                    "cage": samples[sample].identification.cage,
+                        },
             }
             list_empty[f"promedio_center"] = {
                 "center":samples[sample].entryform.center,
@@ -5356,17 +5383,26 @@ def consolidadoScoreGill(form_id):
             list_empty["porcentaje"] = []  
         
     identifications = Identification.objects.filter(entryform__id=analysis.entryform.id)
+    # Pasar identificaciones a dict con un for
+    identifications_list = []
+    for identification in identifications:
+        identifications_dict = {
+            "id": identification.id,
+            "cage": identification.cage,
+        }
+        identifications_list.append(identifications_dict)
+    
 
-    test2 = []
+    sampleexamresultempty = []
 
     sampleexamresults = SampleExamResult.objects.filter(analysis__id=form_id)
     for sampleexamresult in sampleexamresults:
-        test = {
+        sampleexamresultdict = {
             "value": sampleexamresult.value,
             "sample_id": sampleexamresult.sample_exam.sample.id,
             "result": sampleexamresult.result_organ.result.name,
         }
-        test2.append(test)
+        sampleexamresultempty.append(sampleexamresultdict)
 
     analysisoptionalresult = AnalysisOptionalResult.objects.filter(analysis__id=form_id)[0]
     result_name = analysisoptionalresult.result.name
@@ -5375,9 +5411,9 @@ def consolidadoScoreGill(form_id):
     context["result_name"] = result_name
     context["analysis"] = analysis
     context["samples"] = list_empty
-    context["identifications"] = identifications
+    context["identifications"] = identifications_list
     context["entryform"] = entryForm
-    context["sampleexamresults"] = test2
+    context["sampleexamresults"] = sampleexamresultempty
     print(context["result_name"])
 
     route = "app/consolidados/consolidado_SG/consolidado_sg.html" 
