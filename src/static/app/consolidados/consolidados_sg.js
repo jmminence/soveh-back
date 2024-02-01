@@ -105,14 +105,20 @@ function anormalidades_celulares(samples){
 function promedio_identifications(identifications){
   identifications.forEach(function (identification) {
     console.log(identification)
-    identification_promedios = document.getElementsByClassName(`${identification.id}-promedio`);
-    Array.from(identification_promedios).forEach(function (identification_promedio) {
-      table = document.getElementById("asdasd");
-      var row = table.rows[0];
-      var columns = row.cells;
-      for (var i = 0; i < columns.length; i++) {
-          console.log(columns[i]);
-      }
+    identification_promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
+    identification_promedios.forEach(function (identification_promedio) {
+      console.log(identification_promedio)
+      result_prom = identification_promedio.id.split("-")
+      console.log(result_prom)
+      dependencia_prom = Array.from(document.getElementsByClassName(`${result_prom[0]}-${result_prom[1]}`));
+      result_prom = 0;
+      
+      dependencia_prom.forEach(function (dependencia) {
+        result_prom += parseInt(dependencia.value);
+      });
+      console.log(result_prom)
+      result_prom = result_prom / dependencia_prom.length;
+      identification_promedio.value = result_prom;
     });
   });
 }

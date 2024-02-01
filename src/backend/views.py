@@ -5404,8 +5404,11 @@ def consolidadoScoreGill(form_id):
         }
         sampleexamresultempty.append(sampleexamresultdict)
 
-    analysisoptionalresult = AnalysisOptionalResult.objects.filter(analysis__id=form_id)[0]
-    result_name = analysisoptionalresult.result.name
+    analysisoptionalresult = AnalysisOptionalResult.objects.filter(analysis__id=form_id).first()
+    if analysisoptionalresult is not None:
+        result_name = analysisoptionalresult.result.name
+    else:
+        result_name = "Nombre de resultado no encontrado"
     
 
     context["result_name"] = result_name
