@@ -118,7 +118,8 @@ function promedio_identifications(identifications){
       });
       console.log(result_prom)
       result_prom = result_prom / dependencia_prom.length;
-      identification_promedio.value = result_prom;
+      result_prom = Math.ceil(result_prom * 10) / 10; // Redondea hacia arriba y mantiene un decimal
+      identification_promedio.value = result_prom.toFixed(1); // Formatea el número para tener un decimal
     });
   });
 }

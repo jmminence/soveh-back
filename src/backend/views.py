@@ -5332,8 +5332,7 @@ def consolidadoScoreGill(form_id):
     results= Result.objects.filter(type_result__id__in=[3,4,5,6,7])
     for result in results:
         context[result.name] =  result.id
-        
-    
+
     for sample in range(len(samples)):
         try:
             if samples[sample].identification.id != samples[sample+1].identification.id:
