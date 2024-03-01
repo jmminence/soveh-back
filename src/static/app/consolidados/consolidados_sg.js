@@ -51,6 +51,9 @@ function save_sg(event) {
           title: "Datos guardados",
           showConfirmButton: false,
           timer: 1000,
+        }).then(function () {
+          // Refresh the page after 1000 milliseconds (1 second)
+          location.reload();
         });
       } else {
         Swal.fire({
@@ -81,48 +84,135 @@ function load(sampleexamresults, result_name) {
   });
 }
 
-function anormalidades_celulares(samples){
-  samples.forEach(function (sample) {
-    anormalidadescelulares = document.getElementById(`${sample[1].id}-Anormalidades celulares`);
-    dependencias = Array.from(document.getElementsByClassName(`${sample[1].id}-anormalidades_celulares`));
-    
-    dependencias.forEach(function (dependencia) {
-      dependencia.addEventListener("change", function () {
-        valor = 0
-        anormalidadescelulares2 = document.getElementById(`${sample[1].id}-Anormalidades celulares`);
-        dependencias2 = Array.from(document.getElementsByClassName(`${sample[1].id}-anormalidades_celulares`));
-        dependencias2.forEach(function (dependencia) {
-          if (dependencia.value > valor){
-            valor = dependencia.value
-          }
-        });
-        anormalidadescelulares2.value = valor
-      });
+
+// function calculateAnomaliasCelulares() {
+//   // Get all elements with IDs matching the pattern
+//   var espongeosisValue = parseInt(document.querySelector('input[id$="-Espongeosis"]').value);
+//   var necrosisValue = parseInt(document.querySelector('input[id$="-Necrosis"]').value);
+//   var degeneracionValue = parseInt(document.querySelector('input[id$="-Degeneración Ballonizante"]').value);
+//   var exfoliacionValue = parseInt(document.querySelector('input[id$="-Exfoliación"]').value);
+
+//   console.log(espongeosisValue, necrosisValue, degeneracionValue, exfoliacionValue)
+
+//   // Find the maximum value and cap it at 3
+//   var maxValue = Math.min(Math.max(espongeosisValue, necrosisValue, degeneracionValue, exfoliacionValue), 3);
+
+//   // Set the calculated value for Anomalias celulares
+
+//   var AnormalidadesCelulares = document.querySelector('input[id$="-Anormalidades celulares"]');
+//   console.log("inputAC:",AnormalidadesCelulares);
+
+//   AnormalidadesCelulares.value = maxValue;
+//   console.log("inputACVA):",AnormalidadesCelulares.value)
+// }
+
+
+function promedio_identifications(identifications) {
+  identifications.forEach(identification => {
+    // console.log("ID",identifications); //cages con ids
+    const identification_promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
+    // console.log(identification_promedios);
+    let totalSum = 0;
+    // let totalCount = 0;
+    identification_promedios.forEach(identification_promedio => {
+    // console.log(identification_promedio);
+    const result_prom = identification_promedio.id.split("-");
+    // console.log(result_prom);
+    const dependencia_prom = Array.from(document.getElementsByClassName(`${result_prom[0]}-${result_prom[1]}`));
+    // console.log("dep_prom",result_prom);
+    const result_sum = dependencia_prom.reduce((sum, dependencia) => sum + parseInt(dependencia.value), 0);
+    // console.log(result_sum);
+    const result_promedio = Math.ceil(result_sum / dependencia_prom.length * 10) / 10;
+    // console.log("res_prom",result_promedio);
+    identification_promedio.value = result_promedio.toFixed(1);
+    // console.log(identification_promedio.value);
+    totalSum += parseFloat(identification_promedio.value);
+    // totalCount++;
+
     });
+
+    const overallAverage = totalSum;
+    // console.log("Overall Average for ID", identification.id, ":", overallAverage.toFixed(1));
+
+    // Set to the score_prom of proms
+    var score_row = document.getElementsByClassName(`form-control ${identification.id}-score_prom`)[0];
+    // console.log(score_row)
+    score_row.value = overallAverage.toFixed(1);
+
+    // console.log(score_row.value);
   });
 }
 
-function promedio_identifications(identifications){
-  identifications.forEach(function (identification) {
-    console.log(identification)
-    identification_promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
-    identification_promedios.forEach(function (identification_promedio) {
-      console.log(identification_promedio)
-      result_prom = identification_promedio.id.split("-")
-      console.log(result_prom)
-      dependencia_prom = Array.from(document.getElementsByClassName(`${result_prom[0]}-${result_prom[1]}`));
-      result_prom = 0;
-      
-      dependencia_prom.forEach(function (dependencia) {
-        result_prom += parseInt(dependencia.value);
-      });
-      console.log(result_prom)
-      result_prom = result_prom / dependencia_prom.length;
-      result_prom = Math.ceil(result_prom * 10) / 10; // Redondea hacia arriba y mantiene un decimal
-      identification_promedio.value = result_prom.toFixed(1); // Formatea el número para tener un decimal
-    });
+
+
+function promedio_cages(sampleexamresults) {
+  // Create an object to store the sum of values for each sample_id
+  const sumBySampleId = {};
+
+   // Create an object to store the highest value among excluded results
+   const highestExcludedValue = {};
+
+  // Iterate through the sampleexamresults array
+  sampleexamresults.forEach(sampleexamresult => {
+    const { value, sample_id, result } = sampleexamresult;
+    // Check if the result is one of the excluded values
+    if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
+      // Update the highest excluded value for the corresponding sample_id
+      highestExcludedValue[sample_id] = Math.max(highestExcludedValue[sample_id] || 0, value);
+      return;
+    }
+
+    // If the result is 'Anormalidades Celulares', add the highest excluded value to it
+    if (result === 'Anormalidades Celulares') {
+      value += highestExcludedValue[sample_id] || 0;
+      // Update the value attribute of the input for 'Anormalidades Celulares'
+      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades-celulares`);
+      if (anormalidadesCelularesInput) {
+        anormalidadesCelularesInput.value = value;
+      }
+    }
+
+    // If sumBySampleId does not have an entry for the current sample_id, initialize it with 0
+    sumBySampleId[sample_id] = (sumBySampleId[sample_id] || 0) + value;
+  });
+
+  // Iterate through the unique sample_ids and update corresponding HTML input
+  Object.keys(sumBySampleId).forEach(sample_id => {
+    const sumValue = sumBySampleId[sample_id];
+
+    // Update the value attribute of the input for the corresponding sample_id
+    const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
+    if (inputElement) {
+      inputElement.value = sumValue;
+    }
   });
 }
 
-// paso 1 crear funcion para sacar promedio
-//paso 2 ejecutar la funcion cuando se carga la pagina y cuando se cambia el valor de los input
+
+// function promedio_cages(sampleexamresults) {
+//   // Create an object to store the sum of values for each sample_id
+//   const sumBySampleId = {};
+
+//   // Iterate through the sampleexamresults array
+//   sampleexamresults.forEach(sampleexamresult => {
+//     const { value, sample_id } = sampleexamresult;
+//     // console.log("sampleexm",sampleexamresult)
+
+//     // If sumBySampleId does not have an entry for the current sample_id, initialize it with 0
+//     sumBySampleId[sample_id] = (sumBySampleId[sample_id] || 0) + value;
+//   });
+//   // console.log("saidarray",sumBySampleId)
+
+//   // Iterate through the unique sample_ids and update corresponding HTML input
+//   Object.keys(sumBySampleId).forEach(sample_id => {
+//     // console.log("sample ID",sample_id)
+//     const sumValue = sumBySampleId[sample_id];
+//     // console.log("sumbys:",sumBySampleId[sample_id])
+
+//     // Update HTML input with the sumValue for the corresponding sample_id
+//     const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
+//     if (inputElement) {
+//       inputElement.value = sumValue;
+//     }
+//   });
+// }
