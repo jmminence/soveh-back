@@ -107,41 +107,139 @@ function load(sampleexamresults, result_name) {
 // }
 
 
-function promedio_identifications(identifications) {
+// function calculateAverages(identifications) {
+//   // Iterate over each identification
+//   identifications.forEach(identification => {
+
+//     // Get all elements with the class `${identification.id}-promedio`
+//     const promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
+
+//     // Initialize a variable to store the sum of all calculated averages
+//     let totalSum = 0;
+//     let cageCount = 0;
+//     let sumAcc = 0; // Inicializa varirable para ir acumulando promedios
+
+//     // Iterate over each element with the class `${identification.id}-promedio`
+//     promedios.forEach(promedio => {
+
+//       // Split the id of the current element
+//       const result_prom = promedio.id.split("-");
+//       console.log("split", result_prom);
+
+//       // Get all elements with the class `${result_prom[0]}-${result_prom[1]}`
+//       const dependencia_prom = Array.from(document.getElementsByClassName(`${result_prom[0]}-${result_prom[1]}`));
+//       console.log("dependencia_prom", dependencia_prom);
+
+//       // Calculate the sum of values of elements with the class `${result_prom[0]}-${result_prom[1]}`
+//       const result_sum = dependencia_prom.reduce((sum, dependencia) => sum + parseInt(dependencia.value), 0);
+
+//       // Calculate the average and round it to one decimal place
+//       const result_promedio = Math.ceil(result_sum / dependencia_prom.length * 10) / 10;
+
+//       console.log("promedio 1:", promedio);
+
+//       // Set the value of the current element with the calculated average
+//       promedio.value = result_promedio.toFixed(1);
+
+//       // Accumulate the current average to the total sum
+//       totalSum += parseFloat(promedio.value);
+//       console.log("promedio", promedio.value);
+//       cageCount += 1
+//     });
+
+//     // Calculate the cage average
+//     const overallAverage = totalSum;
+
+//     // Set the value of the first element with the class `${identification.id}-score_prom` to the overall average
+//     var score_row = document.getElementsByClassName(`${identification.id}-score_prom`)[0];
+//     score_row.value = overallAverage.toFixed(1);
+//     console.log(overallAverage);
+//   });
+// }
+
+function calculateAverages(identifications) {
+  // Create an object to store the category averages
+  const categoryAverages = {};
+
+  // Iterate over each identification
   identifications.forEach(identification => {
-    // console.log("ID",identifications); //cages con ids
-    const identification_promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
-    // console.log(identification_promedios);
-    let totalSum = 0;
-    // let totalCount = 0;
-    identification_promedios.forEach(identification_promedio => {
-    // console.log(identification_promedio);
-    const result_prom = identification_promedio.id.split("-");
-    // console.log(result_prom);
-    const dependencia_prom = Array.from(document.getElementsByClassName(`${result_prom[0]}-${result_prom[1]}`));
-    // console.log("dep_prom",result_prom);
-    const result_sum = dependencia_prom.reduce((sum, dependencia) => sum + parseInt(dependencia.value), 0);
-    // console.log(result_sum);
-    const result_promedio = Math.ceil(result_sum / dependencia_prom.length * 10) / 10;
-    // console.log("res_prom",result_promedio);
-    identification_promedio.value = result_promedio.toFixed(1);
-    // console.log(identification_promedio.value);
-    totalSum += parseFloat(identification_promedio.value);
-    // totalCount++;
 
+    // Get all elements with the class `${identification.id}-promedio`
+    const promedios = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
+
+    // Iterate over each element with the class `${identification.id}-promedio`
+    promedios.forEach(promedio => {
+
+      // Split the id of the current element
+      const result_prom = promedio.id.split("-");
+
+      // Get the category name
+      const categoryName = result_prom[0];
+
+      // Get all elements with the class `${categoryName}-${result_prom[1]}`
+      const dependencia_prom = Array.from(document.getElementsByClassName(`${categoryName}-${result_prom[1]}`));
+      console.log(dependencia_prom)
+
+      // Calculate the sum of values of elements with the class `${categoryName}-${result_prom[1]}`
+      const result_sum = dependencia_prom.reduce((sum, dependencia) => sum + parseInt(dependencia.value), 0);
+
+      // Calculate the average and round it to one decimal place
+      const result_promedio = Math.ceil(result_sum / dependencia_prom.length * 10) / 10;
+
+      // Set the value of the current element with the calculated average
+      promedio.value = result_promedio.toFixed(1);
+
+      // Update or initialize the category average in the object
+      if (categoryAverages[categoryName]) {
+        categoryAverages[categoryName].sum += result_promedio;
+        categoryAverages[categoryName].count += 1;
+      } else {
+        categoryAverages[categoryName] = {
+          sum: result_promedio,
+          count: 1
+        };
+      }
     });
+  });
 
-    const overallAverage = totalSum;
-    // console.log("Overall Average for ID", identification.id, ":", overallAverage.toFixed(1));
+    // Calculate and set the overall category averages
+    let totalOverallSum = 0;
+    let totalOverallCount = 0;
 
-    // Set to the score_prom of proms
-    var score_row = document.getElementsByClassName(`form-control ${identification.id}-score_prom`)[0];
-    // console.log(score_row)
+  // Calculate and set the overall category averages
+Object.keys(categoryAverages).forEach(categoryName => {
+  console.log(categoryAverages)
+  const categoryData = categoryAverages[categoryName];
+
+  // Check if the count is greater than 0 to avoid division by zero
+  if (categoryData.count > 0) {
+    const overallAverage = categoryData.sum / categoryData.count;
+
+    // Set the value of the first element with the class `${categoryName}-score_prom` to the overall average
+    const score_row = document.getElementsByClassName(`${categoryName}-score_prom`)[0];
     score_row.value = overallAverage.toFixed(1);
 
-    // console.log(score_row.value);
-  });
+    totalOverallSum += overallAverage;
+    totalOverallCount += 1;
+    console.log(overallAverage.value.center)
+    console.log(totalOverallSum, totalOverallCount)
+  }
+});
+
+// Check if totalOverallCount is greater than 0 to avoid division by zero
+if (totalOverallCount > 0) {
+  // Calculate and set the overall average
+  const centerAverage = totalOverallSum / totalOverallCount;
+  const center = document.getElementsByClassName(`${value.center}-${categoryName}`)[0];
+  console.log(center);
+  console.log("Overall Average:", centerAverage.toFixed(1));
+} else {
+  console.log("Overall Average cannot be calculated due to division by zero.");
 }
+}
+
+
+
 
 
 
@@ -151,7 +249,6 @@ function promedio_cages(sampleexamresults) {
 
    // Create an object to store the highest value among excluded results
    const highestExcludedValue = {};
-
   // Iterate through the sampleexamresults array
   sampleexamresults.forEach(sampleexamresult => {
     const { value, sample_id, result } = sampleexamresult;
@@ -159,23 +256,21 @@ function promedio_cages(sampleexamresults) {
     if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
       // Update the highest excluded value for the corresponding sample_id
       highestExcludedValue[sample_id] = Math.max(highestExcludedValue[sample_id] || 0, value);
+      // console.log(sampleexamresult)
+      // console.log("hec",highestExcludedValue[sample_id])
       return;
     }
-
     // If the result is 'Anormalidades Celulares', add the highest excluded value to it
-    if (result === 'Anormalidades Celulares') {
-      value += highestExcludedValue[sample_id] || 0;
+    if (result === 'Anormalidades celulares') {
       // Update the value attribute of the input for 'Anormalidades Celulares'
-      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades-celulares`);
+      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades celulares`);
       if (anormalidadesCelularesInput) {
-        anormalidadesCelularesInput.value = value;
+        anormalidadesCelularesInput.value =  highestExcludedValue[sample_id];
       }
     }
-
     // If sumBySampleId does not have an entry for the current sample_id, initialize it with 0
     sumBySampleId[sample_id] = (sumBySampleId[sample_id] || 0) + value;
   });
-
   // Iterate through the unique sample_ids and update corresponding HTML input
   Object.keys(sumBySampleId).forEach(sample_id => {
     const sumValue = sumBySampleId[sample_id];
@@ -188,31 +283,3 @@ function promedio_cages(sampleexamresults) {
   });
 }
 
-
-// function promedio_cages(sampleexamresults) {
-//   // Create an object to store the sum of values for each sample_id
-//   const sumBySampleId = {};
-
-//   // Iterate through the sampleexamresults array
-//   sampleexamresults.forEach(sampleexamresult => {
-//     const { value, sample_id } = sampleexamresult;
-//     // console.log("sampleexm",sampleexamresult)
-
-//     // If sumBySampleId does not have an entry for the current sample_id, initialize it with 0
-//     sumBySampleId[sample_id] = (sumBySampleId[sample_id] || 0) + value;
-//   });
-//   // console.log("saidarray",sumBySampleId)
-
-//   // Iterate through the unique sample_ids and update corresponding HTML input
-//   Object.keys(sumBySampleId).forEach(sample_id => {
-//     // console.log("sample ID",sample_id)
-//     const sumValue = sumBySampleId[sample_id];
-//     // console.log("sumbys:",sumBySampleId[sample_id])
-
-//     // Update HTML input with the sumValue for the corresponding sample_id
-//     const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
-//     if (inputElement) {
-//       inputElement.value = sumValue;
-//     }
-//   });
-// }
