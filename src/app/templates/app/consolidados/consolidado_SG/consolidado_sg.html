@@ -228,26 +228,26 @@
                                 <td style="background-color: #B0C4DE" class="wide-cell"><input id="{{value.identification.id}}-Score-prom" class="form-control {{value.identification.id}}-score_prom"  style="background-color: #B0C4DE" type="number"   value="0" readonly></td>
                                 {% elif "promedio_center" in key %}
                                 <th>{{value.center}} X</th>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Hiperplasia lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Fusión lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Espongeosis" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Necrosis" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Degeneración Ballonizante" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Exfoliación" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Anormalidades Celulares" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Edema lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" readonly></td>
-                                <td style="background-color: #B0C4DE"><input class="form-control {{value.center}}-Inflamación" style="background-color: #B0C4DE" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #B0C4DE"><input class="form-control {{value.center}}-CGE" style="background-color: #B0C4DE" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #C0C0C0"><input class="form-control {{value.center}}-Deg. Hidrópica" style="background-color: #C0C0C0" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Congestión" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Telangiectasia Trombosis" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Hemorragia" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.center}}-optionmar-promedio{% endif %}" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Otros Parasitos" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Zooplancton" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Microalgas" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Tenocibiboculum" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Otras Bacterias" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Hiperplasia lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Fusión lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Espongeosis" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Necrosis" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Degeneración Ballonizante" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Exfoliación" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Anormalidades Celulares" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #ceb697"><input class="form-control {{value.center}}-Edema lamelar" style="background-color: #ceb697" type="number" min="0" max="3" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #B0C4DE"><input class="form-control {{value.center}}-Inflamación" style="background-color: #B0C4DE" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #B0C4DE"><input class="form-control {{value.center}}-CGE" style="background-color: #B0C4DE" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #C0C0C0"><input class="form-control {{value.center}}-Deg. Hidrópica" style="background-color: #C0C0C0" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Congestión" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Telangiectasia Trombosis" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #FFFACD"><input class="form-control {{value.center}}-Hemorragia" style="background-color: #FFFACD" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.center}}-optionmar-promedio{% endif %}" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Otros Parasitos" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Zooplancton" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Microalgas" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Tenocibiboculum" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #D3D3D3"><input class="form-control {{value.center}}-Otras Bacterias" style="background-color: #D3D3D3" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #B0C4DE" class="wide-cell"><input class="form-control" style="background-color: #B0C4DE" type="number" value="0" readonly></td>
                                 {% elif "porcentaje" in key %}
                                 <th>{{value.identification.cage}} Preval.<br>(%)</th>
@@ -328,7 +328,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
   if (sampleexamresults.length > 0) {
       load(sampleexamresults, result_name);
       promedio_cages(sampleexamresults);
-      calculateAverages(identifications);
+      //calculateAverages(identifications);
+      calculateIdentificationAverages(identifications);
+      calculateScoreRowSums(identifications);
+      calculateCenterNameAverages(identifications);
+      calculateAveragesAC(identifications);
 
   }
 });
