@@ -36,33 +36,39 @@ function save_sg(event) {
   });
 
   if (clear) {
-    $.ajax({
-      type: "POST",
-      url: Urls.save_consolidado_sg(id),
-      data: {
-        data: data,
-      },
-      dataType: "json",
-    }).done(function (data) {
-      ok = data.ok;
-      if (ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Datos guardados",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(function () {
-          // Refresh the page after 1000 milliseconds (1 second)
-          location.reload();
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "No se pudieron guardar los datos!",
-        });
-      }
-    });
+    try {
+      $.ajax({
+        type: "POST",
+        url: Urls.save_consolidado_sg(id),
+        data: {
+          data: data,
+        },
+        dataType: "json",
+        success: function(response) {
+          // Handle success
+          Swal.fire({
+            icon: "success",
+            title: "Datos guardados",
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(function () {
+            location.reload();
+          });
+        },
+        error: function(xhr, status, error) {
+          // Handle error
+          console.error("Save error:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "No se pudieron guardar los datos!",
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      // Optionally, display an error message to the user
+    }
   } else {
     toastr.warning("Complete la informacion necesaria");
   }
@@ -200,32 +206,23 @@ function calculateCenterNameAverages(identifications) {
   identifications.forEach(identification => {
     const promedioCells = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
     promedioCells.forEach(promedio => {
-      console.log(promedio)
       const categoryName = promedio.id.split("-")[1];
-      console.log("categoryName of prom:",categoryName);
       if (!centerAverages[categoryName]) {
         centerAverages[categoryName] = { sum: 0, count: 0 };
       }
       const value = parseFloat(promedio.value);
-      console.log("value",value)
       if (!isNaN(value)) {
         centerAverages[categoryName].sum += value;
         centerAverages[categoryName].count++;
       }
     });
   });
-  console.log('****************')
   // Calculate and update the DOM for Center Name Average
   Object.keys(centerAverages).forEach(categoryName => {
-    console.log("categoryName",categoryName)
-    console.log("centerAverages",centerAverages)
     const { sum, count } = centerAverages[categoryName];
     if (count > 0) {
       const average = (sum / count).toFixed(1);
-      console.log(average) //esta funcionando da los promedios por celda
       const centerAverageCell = document.querySelector(`input[data-center='${center_name}'][class*='${categoryName}']`);
-      console.log("centername :",center_name)
-      console.log(centerAverageCell)
       if (centerAverageCell) {
         centerAverageCell.value = average;
       }
@@ -236,7 +233,7 @@ function calculateCenterNameAverages(identifications) {
 function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
   identifications.forEach(identification => {
     // Calculate average for 'Anormalidades Celulares'
-    const anormalidadesCells = Array.from(document.getElementsByClassName(`${identification.id}-Anormalidades_celulares`));
+    const anormalidadesCells = Array.from(document.getElementsByClassName(`${identification.id}-Anormalidades-Celulares`));
     let anormalidadesTotal = 0;
     let anormalidadesCount = 0;
 
@@ -249,7 +246,7 @@ function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
     });
 
     const anormalidadesAverage = anormalidadesCount > 0 ? (anormalidadesTotal / anormalidadesCount).toFixed(1) : '0';
-    const anormalidadesAverageCell = document.getElementById(`${identification.id}-Anormalidades Celulares-promedio`);
+    const anormalidadesAverageCell = document.getElementById(`${identification.id}-Anormalidades-Celulares-promedio`);
     if (anormalidadesAverageCell) {
       anormalidadesAverageCell.value = anormalidadesAverage;
     }
@@ -273,10 +270,10 @@ function promedio_cages(sampleexamresults) {
     }
 
     // If the result is 'Anormalidades Celulares', add the highest excluded value to it
-    if (result === 'Anormalidades celulares') {
+    if (result === 'Anormalidades-Celulares') {
       // Update the value attribute of the input for 'Anormalidades Celulares'
-      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades celulares`);
-      //console.log("aci",anormalidadesCelularesInput)
+      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades-Celulares`);
+
       if (anormalidadesCelularesInput) {
         anormalidadesCelularesInput.value =  highestExcludedValue[sample_id];
         updatedAnormalidades[sample_id] = true;
@@ -297,3 +294,76 @@ function promedio_cages(sampleexamresults) {
   });
 }
 
+function calculatePromedioCellsPercentage() {
+  // Define the categories based on the provided HTML structure
+  const categories = [ //considerar para después protozoos
+    'Hiperplasia lamelar',
+    'Fusión lamelar',
+    'Espongeosis',
+    'Necrosis',
+    'Degeneración Ballonizante',
+    'Exfoliación',
+    'Anormalidades Celulares',
+    'Edema lamelar',
+    'Inflamación',
+    'CGE',
+    'Deg Hidrópica',
+    'Congestión',
+    'Telangiectasia Trombosis',
+    'Hemorragia',
+    'optionmar',
+    'Otros Parasitos',
+    'Zooplancton',
+    'Microalgas',
+    'Tenocibiboculum',
+    'Otras Bacterias',
+    // Add other categories as needed
+  ];
+  categories.forEach(category => {
+    // Replace spaces with hyphens and escape periods for the class selector
+    const categoryClass = category.replace(/\s+/g, '-');
+    console.log("Category", categoryClass)
+    // Select all input cells for the category, excluding percentage cells
+    const inputCellsSelector = `input[class*="${categoryClass}"]:not(.${categoryClass}-porcentaje):not([data-center])`;
+    console.log(inputCellsSelector);
+    const inputCells = document.querySelectorAll(inputCellsSelector);
+    console.log("********************************");
+    console.log(inputCells);
+
+    let nonZeroCount = 0;
+    inputCells.forEach(cell => {
+      const value = parseFloat(cell.value);
+      if (value > 0) {
+        nonZeroCount++;
+      }
+    });
+
+    // Calculate the percentage of non-zero cells
+    const percentage = nonZeroCount > 0 ? (nonZeroCount / inputCells.length) * 100 : 0;
+
+  // Update the corresponding percentage cell
+    const percentageCellSelector = `input[class*="${categoryClass}-porcentaje"]`;
+    const percentageCell = document.querySelector(percentageCellSelector);
+    if (percentageCell) {
+      percentageCell.value = percentage.toFixed(2);
+      if (percentage <= 0) {
+        percentageCell.value = "0.00"; // Ensure two decimal places for zero
+      }
+    } else {
+      console.error(`Percentage cell for ${category} not found using selector: ${percentageCellSelector}`);
+    }
+  });
+}
+
+
+function setupAnormalidadesCelularesInputListener() {
+  const inputElement = document.querySelector('.Anormalidades-Celulares-porcentaje');
+  if (!inputElement) {
+      console.error('Anormalidades Celulares input not found');
+      return;
+  }
+  inputElement.addEventListener('input', function(event) {
+      console.log(`The value of Anormalidades Celulares was changed to: ${event.target.value}`);
+      // Perform any additional logic here, such as resetting the value if needed
+  });
+}
