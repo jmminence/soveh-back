@@ -4,32 +4,33 @@
 {% block stylesheets %}
 
 <style type="text/css">
+    table {
+    margin-top: 5px;
+    width: 70%; /* Ajusta este valor para cambiar el ancho de la tabla */
+    }
+
+    td, th {
+        vertical-align: middle !important;
+        height: 50px; /* Ajusta este valor para cambiar la altura de las celdas */
+        padding: 5px; /* Ajusta este valor para cambiar el espacio interior de las celdas */
+        }
+
     th {
         background-color: #008385;
         color: #f2f1ef;
-      }
-    tr{
+        }
+
+    tr {
         text-align: center;
-    }
-    tr:nth-child(even) {background: #f2f2f2;}
+        }
+
+    tr:nth-child(even) {
+        background: #f2f2f2;
+        }
 
     table tbody {
         width: 100%;
-    }
-    
-    table{
-        margin-top: 5px;
-    }
-
-    td{
-        vertical-align: middle !important;
-        center-block{
-            text-align: center;}
-    }
-
-    th{
-        vertical-align: middle !important;
-    }
+        }
 
     .scrollit {
         overflow-x: auto;
@@ -89,11 +90,11 @@
       }
     
     .form-control{
-        width: 85%;
+        width: 80%;
     }
 
     .wide-cell{
-        min-width: 170px;
+        min-width: 160px;
     }
 
     .wide-cell2{
@@ -198,7 +199,7 @@
                             {% for key, value in samples.items %}
                             <tr>
                                 {% if "promedio_identification_" in key %}
-                                <th>{{value.identification.cage}} X</th>
+                                <th style="position: sticky; left: 0;">{{value.identification.cage}} X</th>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Hiperplasia lamelar-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Fusión lamelar-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #ddf1b3;" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Espongeosis-promedio"class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="3" value="0" readonly></td>
@@ -221,7 +222,7 @@
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Otras Bacterias-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;" class="wide-cell"><input class="form-control" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #B0C4DE" type="number" value="0" readonly></td>
                                 {% elif "promedio_center" in key %}
-                                <th>{{value.center}} X</th>
+                                <th style="position: sticky; left: 0;">{{value.center}} X</th>
                                 <td style="background-color: #cecdcb"><input class="form-control" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
@@ -244,7 +245,7 @@
                                 <td style="background-color: #cecdcb"><input class="form-control" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #cecdcb" class="wide-cell"><input class="form-control" style="background-color: #B0C4DE; border: 1px solid rgb(215, 99, 99);" type="number" value="0" readonly></td>
                                 {% elif "porcentaje" in key %}
-                                <th>{{value.identification.cage}} Preval.<br>(%)</th>
+                                <th style="position: sticky; left: 0;">{{value.identification.cage}} Preval.<br>(%)</th>
                                 <td style="background-color: #f2f1ef"><input class="form-control" style="background-color: #f2f1ef; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control" style="background-color: #f2f1ef; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control" style="background-color: #f2f1ef; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
@@ -267,7 +268,7 @@
                                 <td style="background-color: #f2f1ef"><input class="form-control" style="background-color: #f2f1ef; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #f2f1ef" class="wide-cell"><input class="form-control" style="background-color: #B0C4DE; border: 1px solid rgb(215, 99, 99);" type="number" value="0" readonly></td>
                                 {% else %}
-                                <th>{{value.identification.cage}} ({{value.index}})</th>
+                                <th style="position: sticky; left: 0;">{{value.identification.cage}} ({{value.index}})</th>
                                 <td style="background-color: #e0c093"><input id="{{value.id}}-Hiperplasia lamelar" class="form-control {{value.identification.id}}-Hiperplasia lamelar" style="background-color: #e0c093; border: 1px solid rgb(45, 44, 44);"type="number" min="0" max="3" value="0" name="{{value.id}}-Hiperplasia lamelar"></td>
                                 <td style="background-color: #e0c093"><input id="{{value.id}}-Fusión lamelar"class="form-control {{value.identification.id}}-Fusión lamelar" style="background-color: #e0c093; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" name="{{value.id}}-Fusión lamelar"></td>
                                 <td style="background-color: #dfcfb9"><input id="{{value.id}}-Espongeosis" class="form-control {{value.identification.id}}-Espongeosis" style="background-color: #dfcfb9; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="3" value="0" name="{{value.id}}-Espongeosis"></td>
@@ -289,7 +290,7 @@
                                 <td style="background-color: #e4e3e1"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Flavobacterium{% else %}{{value.identification.id}}-Tenocibiboculum{% endif %}" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Flavobacterium{% else %}{{value.id}}-Tenocibiboculum{% endif %}"></td>
                                 <td style="background-color: #e4e3e1"><input id="{{value.id}}-Otras Bacterias" class="form-control {{value.identification.id}}-Otras Bacterias" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{{value.id}}-Otras Bacterias"></td>
                                 
-                                <td style="background-color: #B0C4DE" class="wide-cell"><input class="form-control" style="background-color: #f3f2f0"; border: 1px solid rgb(45, 44, 44);" type="number" value="0" readonly></td>
+                                <td style="background-color: #B0C4DE" class="wide-cell"><input class="form-control" style="background-color: #f3f2f0 ; border: 1px solid rgb(45, 44, 44);""; type="number" value="0" readonly></td>
                             {% endif %}
                             </tr>   
                             {% endfor %}
@@ -417,7 +418,6 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-es-ES.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> // Add missing import statement
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> // Add missing import statement
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
