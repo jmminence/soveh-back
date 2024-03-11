@@ -6,6 +6,7 @@
 *.exe
 *.lnk
 **/settings.py
+**/settings_dev.py
 .tox/
 __pycache__
 MANIFEST
@@ -13,11 +14,13 @@ dist/
 docs/_build/
 docs/locale/
 node_modules/
-tests/coverage_html/
+tests/coverage_html/A
 tests/.coverage
 build/
 public/
 tests/report/
+
+
 
 # Non Source
 /bin/
@@ -53,3 +56,6 @@ Dockerfile
 
 # Instaladores
 *.deb
+
+#debug_toolbar
+**/urls.py
