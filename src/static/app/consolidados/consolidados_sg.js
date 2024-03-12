@@ -91,7 +91,7 @@ sampleexamresults.forEach(function (sampleexamresult) {
 }
 
 function calculateIdentificationAverages(identifications) {
-  console.log('Starting calculateIdentificationAverages with identifications:', identifications);
+  //console.log('Starting calculateIdentificationAverages with identifications:', identifications);
 
   identifications.forEach((identification, index) => {
     //console.log(`Processing identification ${index}:`, identification);
@@ -131,28 +131,71 @@ function calculateIdentificationAverages(identifications) {
   });
 
 }
+
+let myChart; // Declare myChart at a higher scope so it can be accessed by generateChart
+
+function generateChart(data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    // Check if the chart instance already exists
+    if (myChart) {
+        // If it exists, update the data
+        myChart.data.labels = Object.keys(data);
+        myChart.data.datasets.forEach((dataset) => {
+            dataset.data = Object.values(data);
+        });
+        myChart.update(); // Update the chart to reflect the new data
+    } else {
+        // If the chart does not exist, create it
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data), // Assuming 'data' is an object with sample IDs as keys
+                datasets: [{
+                    label: '# of Votes',
+                    data: Object.values(data), // The calculated values for each sample ID
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+}
+
 function calculateScoreRowSums(identifications) {
   const categorySums = {};
 
   const excludeCategories = ['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'];
 
-  console.log('Starting calculateScoreRowSums with identifications:', identifications);
+  //console.log('Starting calculateScoreRowSums with identifications:', identifications);
 
   identifications.forEach(identification => {
-    console.log('Processing identification:', identification);
+    //console.log('Processing identification:', identification);
     const promedioCells = Array.from(document.getElementsByClassName(`${identification.id}-promedio`));
-    console.log(`Found ${promedioCells.length} promedioCells for identification ${identification.id}`);
+    //console.log(`Found ${promedioCells.length} promedioCells for identification ${identification.id}`);
 
 
     promedioCells.forEach(promedio => {
       const [categoryId, categoryName] = promedio.id.split("-");
       // Skip the iteration if the category should be excluded
       if (excludeCategories.includes(categoryName)) {
-        console.log(`Skipping excluded category: ${categoryName}`);
+        //console.log(`Skipping excluded category: ${categoryName}`);
         return; // Continue to the next iteration
       }
       const value = parseFloat(promedio.value);
-      console.log(`Processing promedioCell with categoryId: ${categoryId}, value: ${value}`);
+      //console.log(`Processing promedioCell with categoryId: ${categoryId}, value: ${value}`);
 
 
       if (!isNaN(value)) {
@@ -161,19 +204,19 @@ function calculateScoreRowSums(identifications) {
         }
         categorySums[categoryId] += value;
       } else {
-        console.log(`Value is NaN for promedioCell with categoryId: ${categoryId}`);
+        //console.log(`Value is NaN for promedioCell with categoryId: ${categoryId}`);
       }
     });
   });
 
-  console.log('categorySums:', categorySums);
+  //console.log('categorySums:', categorySums);
 
   // Update the DOM for each category's score_row with the sum
   Object.keys(categorySums).forEach(categoryId => {
     //(categorySums)
     const sum = categorySums[categoryId];
     const scoreRow = document.getElementsByClassName(`${categoryId}-score_prom`)[0];
-    console.log(`Updating scoreRow for categoryId: ${categoryId}, sum: ${sum}`);
+    //console.log(`Updating scoreRow for categoryId: ${categoryId}, sum: ${sum}`);
 
     if (scoreRow) {
       scoreRow.value = sum.toFixed(1);
@@ -246,51 +289,7 @@ function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
     }
   });
 }
-function promedio_cages(sampleexamresults) {
-  // Create an object to store the sum of values for each sample_id
-  const sumBySampleId = {};
 
-   // Create an object to store the highest value among excluded results
-   const highestExcludedValue = {};
-   const updatedAnormalidades = {}; // Initialize the object
-
-  // Iterate through the sampleexamresults array
-  sampleexamresults.forEach(sampleexamresult => {
-    const { value, sample_id, result } = sampleexamresult;
-    //console.log(`Processing sample_id: ${sample_id}, result: ${result}, value: ${value}`); // Log for debugging
-    // Check if the result is one of the excluded values
-    if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
-      // Update the highest excluded value for the corresponding sample_id
-      highestExcludedValue[sample_id] = Math.max(highestExcludedValue[sample_id] || 0, value);
-      return;
-    }
-
-    // If the result is 'Anormalidades Celulares', add the highest excluded value to it
-    if (result === 'Anormalidades celulares') {
-      //console.log("Anormalidad celular")
-      // Update the value attribute of the input for 'Anormalidades Celulares'
-      const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades celulares`);
-      //console.log("Input AC :",anormalidadesCelularesInput)
-      if (anormalidadesCelularesInput) {
-        anormalidadesCelularesInput.value =  highestExcludedValue[sample_id];
-        //console.log("Valor AC: ",anormalidadesCelularesInput.value)
-        updatedAnormalidades[sample_id] = true;
-      }
-    }
-    // If sumBySampleId does not have an entry for the current sample_id, initialize it with 0
-    sumBySampleId[sample_id] = (sumBySampleId[sample_id] || 0) + value;
-  });
-  // Iterate through the unique sample_ids and update corresponding HTML input
-  Object.keys(sumBySampleId).forEach(sample_id => {
-    const sumValue = sumBySampleId[sample_id];
-
-    // Update the value attribute of the input for the corresponding sample_id
-    const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
-    if (inputElement) {
-      inputElement.value = sumValue;
-    }
-  });
-}
 function calculatePromedioCellsPercentage() {
   // Define the categories based on the provided HTML structure
   const categories = [ //considerar para después protozoos
@@ -365,3 +364,69 @@ function calculatePromedioCellsPercentage() {
     }
   });
 }
+
+function promedio_cages() {
+  console.log("Starting promedio_cages function");
+  const inputs = document.querySelectorAll('.recalculate-average');
+  console.log(`Found ${inputs.length} inputs to process`);
+
+  const sumBySampleId = {};
+  const highestExcludedValue = {};
+  const updatedAnormalidades = {};
+
+  inputs.forEach(input => {
+      const [sample_id, result] = input.id.split('-'); // Split the id to get sample_id and result
+      const value = parseFloat(input.value);
+      console.log(`Processing input: sample_id=${sample_id}, result=${result}, value=${value}`);
+
+      if (isNaN(value)) {
+        console.log(`Skipping input due to non-numeric value: ${input.id}`);
+        return; // Skip if value is NaN
+    }
+
+      // Handle excluded results and update the highest excluded value for the sample_id
+      if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
+          highestExcludedValue[sample_id] = Math.max(highestExcludedValue[sample_id] || 0, value);
+          console.log(`Updated highestExcludedValue for ${sample_id}: ${highestExcludedValue[sample_id]}`);
+          return;
+      }
+
+      // Handle 'Anormalidades celulares' by setting its value to the highest excluded value for the sample_id
+      if (result === 'Anormalidades celulares') {
+        console.log("entra a AC")
+          const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades celulares`);
+          if (anormalidadesCelularesInput) {
+              anormalidadesCelularesInput.value = highestExcludedValue[sample_id] || 0;
+              updatedAnormalidades[sample_id] = true; // Mark as updated
+              console.log(`Updated Anormalidades celulares for ${sample_id}: ${anormalidadesCelularesInput.value}`);
+          }
+      }
+
+      // Initialize sumBySampleId[sample_id] if it doesn't exist
+      if (!sumBySampleId[sample_id]) {
+          sumBySampleId[sample_id] = 0;
+          console.log(`Initialized sumBySampleId for ${sample_id}`);
+      }
+
+      // Add value to sumBySampleId[sample_id] for other results
+      sumBySampleId[sample_id] += value;
+      console.log(`Updated sumBySampleId for ${sample_id}: ${sumBySampleId[sample_id]}`);
+  });
+
+  // Update the UI based on sumBySampleId for other results
+  Object.keys(sumBySampleId).forEach(sample_id => {
+      const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
+      if (inputElement) {
+          inputElement.value = sumBySampleId[sample_id];
+          console.log(`Updated UI for ${sample_id}: ${sumBySampleId[sample_id]}`);
+      } else {
+          console.log(`Could not find input element for ${sample_id}-Score-prom-cage`);
+      }
+  });
+
+  console.log("Finished promedio_cages function");
+  generateChart(sumBySampleId);
+}
+
+
+
