@@ -199,7 +199,7 @@
                             {% for key, value in samples.items %}
                             <tr>
                                 {% if "promedio_identification_" in key %}
-                                <th style="position: sticky; left: 0;">{{value.identification.cage}} X</th>
+                                <th data-cage-name="{{value.identification.cage}}" style="position: sticky; left: 0;" >{{value.identification.cage}} X</th>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Hiperplasia lamelar-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Fusión lamelar-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #ddf1b3;" type="number" min="0" max="3" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Espongeosis-promedio"class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="3" value="0" readonly></td>
@@ -316,7 +316,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 <script type="text/javascript"src="{% static '/app/consolidados/consolidados_sg.js' %}" defer></script>
+
+
 {% autoescape off %}
 <script>
 

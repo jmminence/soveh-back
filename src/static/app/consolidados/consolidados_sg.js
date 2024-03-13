@@ -134,44 +134,51 @@ function calculateIdentificationAverages(identifications) {
 
 let myChart; // Declare myChart at a higher scope so it can be accessed by generateChart
 
-function generateChart(data) {
+function generateChart(data, labels) {
     const ctx = document.getElementById('myChart').getContext('2d');
 
-    // Check if the chart instance already exists
-    if (myChart) {
-        // If it exists, update the data
-        myChart.data.labels = Object.keys(data);
-        myChart.data.datasets.forEach((dataset) => {
-            dataset.data = Object.values(data);
-        });
-        myChart.update(); // Update the chart to reflect the new data
+    // Define your threshold values
+    const threshold1 = 9; // Example threshold
+    const threshold2 = 18; // Example threshold
+
+
+    // Function to determine bar color based on value
+    const determineBarColor = (value) => {
+      if (value < threshold1) return 'rgba(0, 123, 255, 0.7)'; // Blue for normal
+      if (value < threshold2) return 'rgba(255, 193, 7, 0.7)'; // Yellow for moderate
+      return 'rgba(220, 53, 69, 0.7)'; // Red for severe
+    };
+
+    // If the chart instance already exists, update its data and labels
+    if (window.myChart instanceof Chart) {
+      window.myChart.data.labels = labels;
+      window.myChart.data.datasets.forEach((dataset) => {
+          dataset.data = Object.values(data);
+      });
+      window.myChart.update();
     } else {
-        // If the chart does not exist, create it
-        myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(data), // Assuming 'data' is an object with sample IDs as keys
-                datasets: [{
-                    label: '# of Votes',
-                    data: Object.values(data), // The calculated values for each sample ID
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
+      // If the chart does not exist, create a new instance
+      window.myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Score Promedio de Salud Branquial (0-24)',
+                  data: Object.values(data),
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+  }
 }
 
 function calculateScoreRowSums(identifications) {
@@ -366,9 +373,9 @@ function calculatePromedioCellsPercentage() {
 }
 
 function promedio_cages() {
-  console.log("Starting promedio_cages function");
+  //console.log("Starting promedio_cages function");
   const inputs = document.querySelectorAll('.recalculate-average');
-  console.log(`Found ${inputs.length} inputs to process`);
+  //console.log(`Found ${inputs.length} inputs to process`);
 
   const sumBySampleId = {};
   const highestExcludedValue = {};
@@ -377,40 +384,40 @@ function promedio_cages() {
   inputs.forEach(input => {
       const [sample_id, result] = input.id.split('-'); // Split the id to get sample_id and result
       const value = parseFloat(input.value);
-      console.log(`Processing input: sample_id=${sample_id}, result=${result}, value=${value}`);
+      //console.log(`Processing input: sample_id=${sample_id}, result=${result}, value=${value}`);
 
       if (isNaN(value)) {
-        console.log(`Skipping input due to non-numeric value: ${input.id}`);
+        //console.log(`Skipping input due to non-numeric value: ${input.id}`);
         return; // Skip if value is NaN
     }
 
       // Handle excluded results and update the highest excluded value for the sample_id
       if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
           highestExcludedValue[sample_id] = Math.max(highestExcludedValue[sample_id] || 0, value);
-          console.log(`Updated highestExcludedValue for ${sample_id}: ${highestExcludedValue[sample_id]}`);
+          //console.log(`Updated highestExcludedValue for ${sample_id}: ${highestExcludedValue[sample_id]}`);
           return;
       }
 
       // Handle 'Anormalidades celulares' by setting its value to the highest excluded value for the sample_id
       if (result === 'Anormalidades celulares') {
-        console.log("entra a AC")
+        //console.log("entra a AC")
           const anormalidadesCelularesInput = document.getElementById(`${sample_id}-Anormalidades celulares`);
           if (anormalidadesCelularesInput) {
               anormalidadesCelularesInput.value = highestExcludedValue[sample_id] || 0;
               updatedAnormalidades[sample_id] = true; // Mark as updated
-              console.log(`Updated Anormalidades celulares for ${sample_id}: ${anormalidadesCelularesInput.value}`);
+              //console.log(`Updated Anormalidades celulares for ${sample_id}: ${anormalidadesCelularesInput.value}`);
           }
       }
 
       // Initialize sumBySampleId[sample_id] if it doesn't exist
       if (!sumBySampleId[sample_id]) {
           sumBySampleId[sample_id] = 0;
-          console.log(`Initialized sumBySampleId for ${sample_id}`);
+          //console.log(`Initialized sumBySampleId for ${sample_id}`);
       }
 
       // Add value to sumBySampleId[sample_id] for other results
       sumBySampleId[sample_id] += value;
-      console.log(`Updated sumBySampleId for ${sample_id}: ${sumBySampleId[sample_id]}`);
+      //console.log(`Updated sumBySampleId for ${sample_id}: ${sumBySampleId[sample_id]}`);
   });
 
   // Update the UI based on sumBySampleId for other results
@@ -424,8 +431,14 @@ function promedio_cages() {
       }
   });
 
+  const cageNames = Array.from(document.querySelectorAll('th[data-cage-name]')).map(element => element.getAttribute('data-cage-name'));
+
+  console.log("cageNames", cageNames,"sumbySampleId", sumBySampleId);
+
   console.log("Finished promedio_cages function");
-  generateChart(sumBySampleId);
+  generateChart(sumBySampleId, cageNames);
+
+
 }
 
 
