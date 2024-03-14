@@ -332,8 +332,10 @@
 
 
 <!-- Include the datalabels plugin -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0 "></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+
 
 <!-- Register the datalabels plugin -->
 <script>
@@ -363,12 +365,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
   inputsToRecalculate.forEach(input => {    //tiempo real
     input.addEventListener('input', () => {
       // Assuming these functions are defined to recalculate and update the UI accordingly
-      promedio_cages(sampleexamresults);
       calculateIdentificationAverages(identifications);
-      calculateAveragesAC(identifications);
+      //calculateAveragesAC(identifications);
       calculateCenterNameAverages(identifications);
       calculatePromedioCellsPercentage();
       calculateScoreRowSums(identifications);
+      promedio_cages(sampleexamresults);
       // You might need to pass any necessary parameters to these functions based on your implementation
     });
   });
@@ -380,13 +382,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
   if (sampleexamresults.length > 0) {
 
       console.log("s-ex-r 1", sampleexamresults);
-      load(sampleexamresults, result_name);
-      promedio_cages();
-      calculateIdentificationAverages(identifications);
-      calculateAveragesAC(identifications);
-      calculateCenterNameAverages(identifications);
-      calculatePromedioCellsPercentage(identifications);
-      calculateScoreRowSums(identifications);
+      load(sampleexamresults, result_name); // llena las celdas 'individuales', numeros fijos. No los promedios.
+      calculateIdentificationAverages(identifications); //saca los promedios de los numeros fijos (las celdas verdes)
+      //calculateAveragesAC(identifications); // al parecer no se necesitaba, estaba mal el orden de funcs
+      calculateCenterNameAverages(identifications); // promedio centros (promedio de los 3 verdes)
+      calculatePromedioCellsPercentage(identifications); // porcentaje
+      calculateScoreRowSums(identifications); //calcula el score de las cells verdes
+      promedio_cages(); //calcula los score (cells morado claro)
 
   }
 });

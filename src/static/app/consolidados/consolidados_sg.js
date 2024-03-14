@@ -134,27 +134,45 @@ function calculateIdentificationAverages(identifications) {
 
 let myChart; // Declare myChart at a higher scope so it can be accessed by generateChart
 
-function generateChartProms(data, labels) {
-  console.log('Data:', data); // This will show you what 'data' actually is
-  console.log('Data type:', typeof data); // This will show you the type of 'data'
+function generateChartProms(data, labels, centerAverage, centerName) {
+  // Log the data to ensure it's correct
+  console.log('Data:', data);
+  console.log('Labels:', labels);
+  console.log('Center Average:', centerAverage);
 
   const ctx = document.getElementById('myChart').getContext('2d');
 
   // Define your threshold values
-  const threshold1 = 4; // Example threshold
-  const threshold2 = 7; // Example threshold
-  const threshold3 = 10; // Example threshold
-
+  const threshold1 = 4;
+  const threshold2 = 7;
+  const threshold3 = 10;
 
   // Convert 'data' to an array if it's not already
   if (!Array.isArray(data)) {
     data = Object.values(data);
   }
 
+  // Add the center average to the data array
+  data.push(centerAverage);
+
+  // Add a label for the center average
+  labels.push(centerName);
+
+  // Define an array of colors for the bars
+  const barColors = data.map((_, index) => index === data.length - 1 ? 'rgba(122, 111, 233, 0.4)' : 'rgba(54, 162, 235, 0.2)');
+
   // Chart options
   const chartOptions = {
-
     plugins: {
+      datalabels: {
+        display: true, // Ensure that datalabels are displayed
+        color: '#444', // Set the color of the datalabels
+        anchor: 'end', // Anchor the labels to the end of the bars
+        align: 'top', // Align the labels to the top of the bars
+        formatter: (value, context) => {
+          return value.toFixed(1); // Format the value to one decimal place
+        }
+      },
       legend: {
         display: true,
         labels: {
@@ -163,14 +181,6 @@ function generateChartProms(data, labels) {
       },
       tooltip: {
         enabled: true
-      },
-      datalabels: {
-        color: '#000000',
-        anchor: 'end',
-        align: 'top',
-        formatter: (value, context) => {
-          return value.toLocaleString(); // or return value.toFixed(2) for decimal values
-        }
       },
       annotation: {
         annotations: {
@@ -233,23 +243,7 @@ function generateChartProms(data, labels) {
             yPadding: 6,
             position: 'center',
             textAlign: 'center'
-          },
-          text5: {
-            type: 'label',
-            xValue: 'TK 3', // Adjust this based on your x-axis scale
-            yValue: threshold1, // Position it between threshold2 and threshold3
-            content: data[0]+'actualizar segun its', // The text you want to display
-            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
-            color: 'black', // Text color
-            font: {
-              size: 12
-            },
-            xPadding: 6,
-            yPadding: 6,
-            position: 'center',
-            textAlign: 'center'
           }
-          // Add more text annotations as needed
         }
       }
     },
@@ -307,9 +301,11 @@ function generateChartProms(data, labels) {
 
   // If the chart instance already exists, update its data and labels
   if (window.myChart instanceof Chart) {
-      window.myChart.data.labels = labels;
-      window.myChart.data.datasets[0].data = data;
-      window.myChart.update();
+    window.myChart.options = chartOptions; // Make sure to update the options
+    window.myChart.data.labels = labels;
+    window.myChart.data.datasets[0].data = data;
+    window.myChart.data.datasets[0].backgroundColor = barColors; // Assign the colors array
+    window.myChart.update(); // Don't forget to call update() to render the changes
   } else {
       // If the chart does not exist, create a new instance
       window.myChart = new Chart(ctx, {
@@ -319,7 +315,7 @@ function generateChartProms(data, labels) {
               datasets: [{
                   label: 'Score Promedio de Salud Branquial (0-24)',
                   data: data,
-                  backgroundColor:'rgba(1, 99, 132)',
+                  backgroundColor: barColors, // Assign the colors array here
                   borderColor: 'rgba(2, 9, 1)',
                   borderWidth: 1
               }]
@@ -329,67 +325,13 @@ function generateChartProms(data, labels) {
   }
 }
 
-function generateChartPromsBoxed(data, labels) {
-  // Ensure the Chart.js and the boxplot plugin are correctly imported
-  // For ES modules, you would typically import these at the top of your file:
-  // import Chart from 'chart.js/auto';
-  // import 'chartjs-chart-box-and-violin-plot';
-
-  const ctx = document.getElementById('myBoxChart').getContext('2d');
-
-  // Assuming 'data' is correctly formatted for the boxplot chart
-  // The data format for a boxplot typically includes min, q1, median, q3, max, and outliers for each dataset
-
-  // Chart options
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true
-      },
-      tooltip: {
-        enabled: true
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
-  };
-
-  // Check if the chart instance already exists
-  if (window.myBoxChart instanceof Chart) {
-    window.myBoxChart.data.labels = labels;
-    window.myBoxChart.data.datasets[0].data = data;
-    window.myBoxChart.update();
-  } else {
-    // Create a new boxplot chart instance
-    window.myBoxChart = new Chart(ctx, {
-      type: 'boxplot', // Specify the chart type as 'boxplot'
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Score Promedio de Salud Branquial (0-24)',
-          backgroundColor: 'rgba(1, 99, 132, 0.5)',
-          borderColor: 'rgba(2, 9, 1, 1)',
-          borderWidth: 1,
-          outlierColor: '#999999',
-          padding: 10,
-          itemRadius: 0,
-          data: data // The structured data for the boxplot
-        }]
-      },
-      options: chartOptions
-    });
-  }
-}
 function calculateScoreRowSums(identifications) {
-  const categorySums = {};
 
+  const categorySums = {};
   const excludeCategories = ['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'];
 
   //console.log('Starting calculateScoreRowSums with identifications:', identifications);
+
 
   identifications.forEach(identification => {
     //console.log('Processing identification:', identification);
@@ -421,20 +363,47 @@ function calculateScoreRowSums(identifications) {
 
   //console.log('categorySums:', categorySums);
 
-  // Update the DOM for each category's score_row with the sum
+  // New code to collect score_prom values and labels
+  let scoreRowValues = [];
+  let labels = [];
+  const cageNameElements = document.querySelectorAll('th[data-cage-name]');
+
+  // Iterate over the cageNameElements to collect the names
+  cageNameElements.forEach((th) => {
+    // Get the cage name from the data-cage-name attribute
+    const cageName = th.getAttribute('data-cage-name');
+    labels.push(cageName);
+  });
+
   Object.keys(categorySums).forEach(categoryId => {
-    //(categorySums)
+
     const sum = categorySums[categoryId];
     const scoreRow = document.getElementsByClassName(`${categoryId}-score_prom`)[0];
-    //console.log(`Updating scoreRow for categoryId: ${categoryId}, sum: ${sum}`);
-
+    console.log(`ScoreRow:`, scoreRow);
     if (scoreRow) {
-      scoreRow.value = sum.toFixed(1);
+      scoreRow.value = sum.toFixed(1); // Update the scoreRow value
+      scoreRowValues.push(parseFloat(scoreRow.value)); // Collect the value for the chart
+
     } else {
       console.error(`scoreRow not found for categoryId: ${categoryId}`);
     }
   });
-}function calculateCenterNameAverages(identifications) {
+
+
+  // Ensure that you have values and labels for each score_prom
+  console.log('Score Prom Values:', scoreRowValues);
+  console.log('Labels:', labels);
+
+  // Now, you have scorePromValues and labels ready to be used in the chart
+  // Assuming calculateCenterNameAverages has already been called and the center average is updated in an element with id 'center-averages-sum'
+  const centerAverage = parseFloat(document.getElementById('center-averages-sum').value);
+  const centerName = document.querySelector('[data-center]').getAttribute('data-center');
+
+
+  generateChartProms(scoreRowValues, labels, centerAverage, centerName);
+}
+
+function calculateCenterNameAverages(identifications) {
   const centerAverages = {};
   const center_name = document.querySelector('[data-center]').getAttribute('data-center');
   let totalSumOfAverages = 0; // Initialize a variable to hold the sum of all averages
@@ -477,29 +446,6 @@ function calculateScoreRowSums(identifications) {
     totalAveragesInput.value = totalSumOfAverages.toFixed(1);
   }
 }
-function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
-  identifications.forEach(identification => {
-    // Calculate average for 'Anormalidades Celulares'
-    const anormalidadesCells = Array.from(document.getElementsByClassName(`${identification.id}-Anormalidades celulares`));
-    let anormalidadesTotal = 0;
-    let anormalidadesCount = 0;
-
-    anormalidadesCells.forEach(cell => {
-      const value = parseFloat(cell.value);
-      if (!isNaN(value)) {
-        anormalidadesTotal += value;
-        anormalidadesCount++;
-      }
-    });
-
-    const anormalidadesAverage = anormalidadesCount > 0 ? (anormalidadesTotal / anormalidadesCount).toFixed(1) : '0';
-    const anormalidadesAverageCell = document.getElementById(`${identification.id}-Anormalidades celulares-promedio`);
-    if (anormalidadesAverageCell) {
-      anormalidadesAverageCell.value = anormalidadesAverage;
-    }
-  });
-}
-
 function calculatePromedioCellsPercentage() {
   // Define the categories based on the provided HTML structure
   const categories = [ //considerar para después protozoos
@@ -650,12 +596,6 @@ function promedio_cages() {
       }
   });
 
-  const cageNames = Array.from(document.querySelectorAll('th[data-cage-name]')).map(element => element.getAttribute('data-cage-name'));
-
-  console.log("cageNames", cageNames,"sumbySampleId", sumBySampleId);
-
-  console.log("Finished promedio_cages function");
-  generateChartProms(sumBySampleId, cageNames);
 }
 
 function prepareBoxplotData(valuesByCategory) {
@@ -712,4 +652,81 @@ function calculateOutliers(values) {
   return values.filter(value => value < lowerBound || value > upperBound);
 }
 
+//----------------------------------------------------------------//
+function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
+  identifications.forEach(identification => {
+    // Calculate average for 'Anormalidades Celulares'
+    const anormalidadesCells = Array.from(document.getElementsByClassName(`${identification.id}-Anormalidades celulares`));
+    let anormalidadesTotal = 0;
+    let anormalidadesCount = 0;
 
+    anormalidadesCells.forEach(cell => {
+      const value = parseFloat(cell.value);
+      if (!isNaN(value)) {
+        anormalidadesTotal += value;
+        anormalidadesCount++;
+      }
+    });
+
+    const anormalidadesAverage = anormalidadesCount > 0 ? (anormalidadesTotal / anormalidadesCount).toFixed(1) : '0';
+    const anormalidadesAverageCell = document.getElementById(`${identification.id}-Anormalidades celulares-promedio`);
+    if (anormalidadesAverageCell) {
+      anormalidadesAverageCell.value = anormalidadesAverage;
+    }
+  });
+}
+function generateChartPromsBoxed(data, labels) {
+  // Ensure the Chart.js and the boxplot plugin are correctly imported
+  // For ES modules, you would typically import these at the top of your file:
+  // import Chart from 'chart.js/auto';
+  // import 'chartjs-chart-box-and-violin-plot';
+
+  const ctx = document.getElementById('myBoxChart').getContext('2d');
+
+  // Assuming 'data' is correctly formatted for the boxplot chart
+  // The data format for a boxplot typically includes min, q1, median, q3, max, and outliers for each dataset
+
+  // Chart options
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true
+      },
+      tooltip: {
+        enabled: true
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+  // Check if the chart instance already exists
+  if (window.myBoxChart instanceof Chart) {
+    window.myBoxChart.data.labels = labels;
+    window.myBoxChart.data.datasets[0].data = data;
+    window.myBoxChart.update();
+  } else {
+    // Create a new boxplot chart instance
+    window.myBoxChart = new Chart(ctx, {
+      type: 'boxplot', // Specify the chart type as 'boxplot'
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Score Promedio de Salud Branquial (0-24)',
+          backgroundColor: 'rgba(1, 99, 132, 0.5)',
+          borderColor: 'rgba(2, 9, 1, 1)',
+          borderWidth: 1,
+          outlierColor: '#999999',
+          padding: 10,
+          itemRadius: 0,
+          data: data // The structured data for the boxplot
+        }]
+      },
+      options: chartOptions
+    });
+  }
+}
