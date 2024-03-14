@@ -134,29 +134,183 @@ function calculateIdentificationAverages(identifications) {
 
 let myChart; // Declare myChart at a higher scope so it can be accessed by generateChart
 
-function generateChart(data, labels) {
-    const ctx = document.getElementById('myChart').getContext('2d');
+function generateChartProms(data, labels) {
+  console.log('Data:', data); // This will show you what 'data' actually is
+  console.log('Data type:', typeof data); // This will show you the type of 'data'
 
-    // Define your threshold values
-    const threshold1 = 9; // Example threshold
-    const threshold2 = 18; // Example threshold
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  // Define your threshold values
+  const threshold1 = 4; // Example threshold
+  const threshold2 = 7; // Example threshold
+  const threshold3 = 10; // Example threshold
 
 
-    // Function to determine bar color based on value
-    const determineBarColor = (value) => {
-      if (value < threshold1) return 'rgba(0, 123, 255, 0.7)'; // Blue for normal
-      if (value < threshold2) return 'rgba(255, 193, 7, 0.7)'; // Yellow for moderate
-      return 'rgba(220, 53, 69, 0.7)'; // Red for severe
-    };
+  // Convert 'data' to an array if it's not already
+  if (!Array.isArray(data)) {
+    data = Object.values(data);
+  }
 
-    // If the chart instance already exists, update its data and labels
-    if (window.myChart instanceof Chart) {
+  // Chart options
+  const chartOptions = {
+
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: 'rgb(5, 99, 32)'
+        }
+      },
+      tooltip: {
+        enabled: true
+      },
+      datalabels: {
+        color: '#000000',
+        anchor: 'end',
+        align: 'top',
+        formatter: (value, context) => {
+          return value.toLocaleString(); // or return value.toFixed(2) for decimal values
+        }
+      },
+      annotation: {
+        annotations: {
+          text1: {
+            type: 'label',
+            xValue: 'GRAVEDAD', // Adjust this based on your x-axis scale
+            yValue: (threshold1) / 2, // Position it between threshold2 and threshold3
+            content: 'NO SIGNIFICATIVO', // The text you want to display
+            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
+            color: 'black', // Text color
+            font: {
+              size: 12
+            },
+            xPadding: 6,
+            yPadding: 6,
+            position: 'center',
+            textAlign: 'center'
+          },
+          text2: {
+            type: 'label',
+            xValue: 'GRAVEDAD', // You might need to adjust this based on your x-axis scale
+            yValue: threshold1 + 0.2, // Position it between threshold1 and threshold2
+            content: 'LEVE', // The text you want to display
+            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
+            color: 'black', // Text color
+            font: {
+              size: 12
+            },
+            xPadding: 6,
+            yPadding: 6,
+            position: 'center',
+            textAlign: 'center'
+          },
+          text3: {
+            type: 'label',
+            xValue: 'GRAVEDAD', // Adjust this based on your x-axis scale
+            yValue: threshold2 + 0.2, // Position it between threshold2 and threshold3
+            content: 'MODERADO', // The text you want to display
+            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
+            color: 'black', // Text color
+            font: {
+              size: 12
+            },
+            xPadding: 6,
+            yPadding: 6,
+            position: 'center',
+            textAlign: 'center'
+          },
+          text4: {
+            type: 'label',
+            xValue: 'GRAVEDAD', // Adjust this based on your x-axis scale
+            yValue: threshold3 + 0.2, // Position it between threshold2 and threshold3
+            content: 'SEVERO', // The text you want to display
+            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
+            color: 'black', // Text color
+            font: {
+              size: 12
+            },
+            xPadding: 6,
+            yPadding: 6,
+            position: 'center',
+            textAlign: 'center'
+          },
+          text5: {
+            type: 'label',
+            xValue: 'TK 3', // Adjust this based on your x-axis scale
+            yValue: threshold1, // Position it between threshold2 and threshold3
+            content: data[0]+'actualizar segun its', // The text you want to display
+            backgroundColor: 'rgba(0,0,0,0)', // Transparent background
+            color: 'black', // Text color
+            font: {
+              size: 12
+            },
+            xPadding: 6,
+            yPadding: 6,
+            position: 'center',
+            textAlign: 'center'
+          }
+          // Add more text annotations as needed
+        }
+      }
+    },
+    animation: {
+      onComplete: () => {
+        const chartInstance = window.myChart;
+        const ctx = chartInstance.ctx;
+        ctx.font = Chart.helpers.toFont({
+          size: 12,
+          weight: 'normal',
+          family: Chart.defaults.font.family,
+        }).string;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+
+        // Draw threshold lines
+        const yScale = chartInstance.scales.y;
+        const xScale = chartInstance.scales.x;
+        const chartArea = chartInstance.chartArea;
+
+        // Draw the first threshold line
+        ctx.strokeStyle = '#28a745';  // green
+        ctx.beginPath();
+        let lineY = yScale.getPixelForValue(threshold1);
+        ctx.moveTo(chartArea.left, lineY);
+        ctx.lineTo(chartArea.right, lineY);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw the second threshold line
+        ctx.strokeStyle = '#ffa500'; // orange
+        ctx.beginPath();
+        lineY = yScale.getPixelForValue(threshold2);
+        ctx.moveTo(chartArea.left, lineY);
+        ctx.lineTo(chartArea.right, lineY);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw the third threshold line
+        ctx.strokeStyle =  '#ff0000'// red
+        ctx.beginPath();
+        lineY = yScale.getPixelForValue(threshold3);
+        ctx.moveTo(chartArea.left, lineY);
+        ctx.lineTo(chartArea.right, lineY);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+  };
+
+  // If the chart instance already exists, update its data and labels
+  if (window.myChart instanceof Chart) {
       window.myChart.data.labels = labels;
-      window.myChart.data.datasets.forEach((dataset) => {
-          dataset.data = Object.values(data);
-      });
+      window.myChart.data.datasets[0].data = data;
       window.myChart.update();
-    } else {
+  } else {
       // If the chart does not exist, create a new instance
       window.myChart = new Chart(ctx, {
           type: 'bar',
@@ -164,23 +318,72 @@ function generateChart(data, labels) {
               labels: labels,
               datasets: [{
                   label: 'Score Promedio de Salud Branquial (0-24)',
-                  data: Object.values(data),
-                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                  borderColor: 'rgba(255, 99, 132, 1)',
+                  data: data,
+                  backgroundColor:'rgba(1, 99, 132)',
+                  borderColor: 'rgba(2, 9, 1)',
                   borderWidth: 1
               }]
           },
-          options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  }
-              }
-          }
+          options: chartOptions
       });
   }
 }
 
+function generateChartPromsBoxed(data, labels) {
+  // Ensure the Chart.js and the boxplot plugin are correctly imported
+  // For ES modules, you would typically import these at the top of your file:
+  // import Chart from 'chart.js/auto';
+  // import 'chartjs-chart-box-and-violin-plot';
+
+  const ctx = document.getElementById('myBoxChart').getContext('2d');
+
+  // Assuming 'data' is correctly formatted for the boxplot chart
+  // The data format for a boxplot typically includes min, q1, median, q3, max, and outliers for each dataset
+
+  // Chart options
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true
+      },
+      tooltip: {
+        enabled: true
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+  // Check if the chart instance already exists
+  if (window.myBoxChart instanceof Chart) {
+    window.myBoxChart.data.labels = labels;
+    window.myBoxChart.data.datasets[0].data = data;
+    window.myBoxChart.update();
+  } else {
+    // Create a new boxplot chart instance
+    window.myBoxChart = new Chart(ctx, {
+      type: 'boxplot', // Specify the chart type as 'boxplot'
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Score Promedio de Salud Branquial (0-24)',
+          backgroundColor: 'rgba(1, 99, 132, 0.5)',
+          borderColor: 'rgba(2, 9, 1, 1)',
+          borderWidth: 1,
+          outlierColor: '#999999',
+          padding: 10,
+          itemRadius: 0,
+          data: data // The structured data for the boxplot
+        }]
+      },
+      options: chartOptions
+    });
+  }
+}
 function calculateScoreRowSums(identifications) {
   const categorySums = {};
 
@@ -375,6 +578,7 @@ function calculatePromedioCellsPercentage() {
 function promedio_cages() {
   //console.log("Starting promedio_cages function");
   const inputs = document.querySelectorAll('.recalculate-average');
+  const valuesBySampleId = {}; // Object to hold arrays of values for each category
   //console.log(`Found ${inputs.length} inputs to process`);
 
   const sumBySampleId = {};
@@ -389,7 +593,17 @@ function promedio_cages() {
       if (isNaN(value)) {
         //console.log(`Skipping input due to non-numeric value: ${input.id}`);
         return; // Skip if value is NaN
-    }
+      }
+
+      // Initialize the array for the category if it doesn't exist
+      if (!valuesBySampleId[sample_id]) {
+        valuesBySampleId[sample_id] = [];
+      }
+
+      // Append the value to the category's array
+      valuesBySampleId[sample_id].push(value);
+
+
 
       // Handle excluded results and update the highest excluded value for the sample_id
       if (['Espongeosis', 'Necrosis', 'Degeneración Ballonizante', 'Exfoliación'].includes(result)) {
@@ -415,10 +629,15 @@ function promedio_cages() {
           //console.log(`Initialized sumBySampleId for ${sample_id}`);
       }
 
+      // Append the value to the category's array
+      valuesBySampleId[sample_id].push(value);
+
       // Add value to sumBySampleId[sample_id] for other results
       sumBySampleId[sample_id] += value;
       //console.log(`Updated sumBySampleId for ${sample_id}: ${sumBySampleId[sample_id]}`);
   });
+  console.log("valuesBySampleId", valuesBySampleId);
+  prepareBoxplotData(valuesBySampleId);
 
   // Update the UI based on sumBySampleId for other results
   Object.keys(sumBySampleId).forEach(sample_id => {
@@ -436,10 +655,61 @@ function promedio_cages() {
   console.log("cageNames", cageNames,"sumbySampleId", sumBySampleId);
 
   console.log("Finished promedio_cages function");
-  generateChart(sumBySampleId, cageNames);
-
-
+  generateChartProms(sumBySampleId, cageNames);
 }
 
+function prepareBoxplotData(valuesByCategory) {
+  const boxplotData = Object.keys(valuesByCategory).map(category => {
+    const values = valuesByCategory[category].sort((a, b) => a - b);
+    const min = values[0];
+    const max = values[values.length - 1];
+    const median = calculateMedian(values);
+    const q1 = calculateQuartile(values, 0.25);
+    const q3 = calculateQuartile(values, 0.75);
+    const outliers = calculateOutliers(values); // Implement based on your criteria
+
+    return {
+      category,
+      min,
+      q1,
+      median,
+      q3,
+      max,
+      outliers
+    };
+  });
+
+
+  return generateChartPromsBoxed(boxplotData);
+}
+
+// Example helper function to calculate the median
+function calculateMedian(values) {
+  const half = Math.floor(values.length / 2);
+  if (values.length % 2) return values[half];
+  return (values[half - 1] + values[half]) / 2.0;
+}
+
+function calculateQuartile(values, q) {
+  const pos = (values.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+
+  if (values[base + 1] !== undefined) {
+    return values[base] + rest * (values[base + 1] - values[base]);
+  } else {
+    return values[base];
+  }
+}
+
+function calculateOutliers(values) {
+  const q1 = calculateQuartile(values, 0.25);
+  const q3 = calculateQuartile(values, 0.75);
+  const iqr = q3 - q1;
+  const lowerBound = q1 - 1.5 * iqr;
+  const upperBound = q3 + 1.5 * iqr;
+
+  return values.filter(value => value < lowerBound || value > upperBound);
+}
 
 

@@ -310,22 +310,42 @@
 <div class="chart-container" style="position: relative; height:40vh; width:80vw">
   <canvas id="myChart"></canvas>
 </div>
+<br><br>
+<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+  <canvas id="princHallazgosChart"></canvas>
+</div>
+<br><br>
+<span style="text-align: center; background-color: lightcoral;">4. Boxplot EN DESARROLLO</span>
+<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+  <canvas id="myBoxChart"></canvas>
+</div>
+
 {% endblock content %}
 
 {% block scripts %}
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
-<script type="text/javascript"src="{% static '/app/consolidados/consolidados_sg.js' %}" defer></script>
+<!-- Include PlotBox -->
+<script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4.2.8/build/index.umd.min.js"></script>
+
+
+<!-- Include the datalabels plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+<!-- Register the datalabels plugin -->
+<script>
+  Chart.register(ChartDataLabels, ChartAnnotation);
+</script>
+
+
+<script type="text/javascript" src="{% static '/app/consolidados/consolidados_sg.js' %}" defer></script>
 
 
 {% autoescape off %}
 <script>
-
-
-
-
 
 document.addEventListener('DOMContentLoaded', (event) => {
   console.log('DOMContentLoaded event fired');
