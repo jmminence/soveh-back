@@ -29,6 +29,7 @@ venv/
 django3/
 local/
 .vscode/
+scoregill/
 
 
 # Mac
