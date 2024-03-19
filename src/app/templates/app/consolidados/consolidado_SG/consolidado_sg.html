@@ -103,6 +103,20 @@
     .select-wide {
         width: 100% !important;
     }
+
+    .chart-and-table-container {
+      margin-bottom: 2rem; /* Adjust spacing as needed */
+    }
+    .development-notice {
+      text-align: center;
+      background-color: lightcoral;
+      display: block; /* Ensure it takes the full width if not already a block element */
+      padding: 0.5rem; /* Add some padding for visual appeal */
+    }
+    .data-table-container {
+      width: 80vw; /* Match the width of the chart for alignment */
+      overflow-x: auto; /* Allows table to be scrollable horizontally if it's too wide */
+    }
 </style>
 
 {% endblock stylesheets %}
@@ -306,19 +320,32 @@
             </div>
     </form>
 
+    <div class="chart-and-table-container">
+      <div class="chart-container">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
 
-<div class="chart-container" style="position: relative; height:40vh; width:80vw">
-  <canvas id="myChart"></canvas>
-</div>
-<br><br>
-<div class="chart-container" style="position: relative; height:40vh; width:80vw">
-  <canvas id="princHallazgosChart"></canvas>
-</div>
-<br><br>
-<span style="text-align: center; background-color: lightcoral;">4. Boxplot EN DESARROLLO</span>
-<div class="chart-container" style="position: relative; height:40vh; width:80vw">
-  <canvas id="myBoxChart"></canvas>
-</div>
+    <div class="chart-and-table-container">
+      <div class="chart-container">
+        <canvas id="myMixedChart"></canvas>
+      </div>
+      <div id="chartDataTable" class="data-table-container"></div>
+    </div>
+
+    <div class="chart-and-table-container">
+      <div class="chart-container">
+        <canvas id="myMixedChart2"></canvas>
+      </div>
+     <div id="chartDataTable2" class="data-table-container"></div>
+    </div>
+
+    <div class="chart-and-table-container">
+      <h3 class="development-notice">4. Boxplot EN DESARROLLO</h3>
+      <div class="chart-container">
+        <canvas id="myBoxChart"></canvas>
+      </div>
+    </div>
 
 {% endblock content %}
 
@@ -339,7 +366,6 @@
 
 <!-- Register the datalabels plugin -->
 <script>
-  Chart.register(ChartDataLabels, ChartAnnotation);
 </script>
 
 
@@ -371,7 +397,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
       calculatePromedioCellsPercentage();
       calculateScoreRowSums(identifications);
       promedio_cages(sampleexamresults);
-      // You might need to pass any necessary parameters to these functions based on your implementation
+      extractDataForMixedChart(identifications);
+      extractDataForMixedChart2(identifications);
     });
   });
 
@@ -381,7 +408,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   if (sampleexamresults.length > 0) {
 
-      console.log("s-ex-r 1", sampleexamresults);
+      //console.log("s-ex-r 1", sampleexamresults);
       load(sampleexamresults, result_name); // llena las celdas 'individuales', numeros fijos. No los promedios.
       calculateIdentificationAverages(identifications); //saca los promedios de los numeros fijos (las celdas verdes)
       //calculateAveragesAC(identifications); // al parecer no se necesitaba, estaba mal el orden de funcs
@@ -389,7 +416,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
       calculatePromedioCellsPercentage(identifications); // porcentaje
       calculateScoreRowSums(identifications); //calcula el score de las cells verdes
       promedio_cages(); //calcula los score (cells morado claro)
-
+      extractDataForMixedChart(identifications);
+      extractDataForMixedChart2(identifications);
   }
 });
 
