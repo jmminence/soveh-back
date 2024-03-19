@@ -5326,10 +5326,9 @@ def consolidadoScoreGill(form_id):
     analysis = AnalysisForm.objects.get(id=form_id)
     samples = list(Sample.objects.filter(entryform__id=analysis.entryform.id).order_by("index"))
     list_empty = dict()
-    
     entryForm = EntryForm.objects.get(id=analysis.entryform.id)
-    
     results= Result.objects.filter(type_result__id__in=[3,4,5,6,7])
+    
     for result in results:
         context[result.name] =  result.id
 
@@ -5451,6 +5450,18 @@ def saveConsolidadoScoreGill(request, form_id):
     data = request.POST
     return
     """
+
+def createMethodology_SG(request):
+
+    data = request.POST
+    analysis_id = data.get("analysis_id")
+    analysis = Analysis.objects.get(id=analysis_id)
+
+    methodology = Methodology.objects.create(exam=analysis.exam)
+
+    return JsonResponse({'id': methodology.id})
+
+
 def template_consolidados_SG(request, id):
     analysis = Analysis.objects.get(id=id)
 
@@ -5560,4 +5571,92 @@ def template_consolidados_SG(request, id):
         "methodology":methodology,
     }
 
-    return render(request, "app/consolidados/consolidado_HE/template_consolidado_SG.html", context)
+    return render(request, "app/consolidados/consolidado_SG/template_consolidado_SG.html", context)
+
+@never_cache
+def download_consolidados_SG(request, id):
+    """Downloads a PDF file for a :model:`backend.Preinvoice` resume"""
+    analysis = Analysis.objects.get(id=id)
+    report = AnalysisReport.objects.get(analysis_id=id)
+    no_caso = analysis.entryform.no_caso
+    exam = analysis.exam.abbreviation
+    date = report.report_date.strftime('%d%m%y') if report.report_date != None else " "
+    correlative= "{:02d}".format(report.correlative)
+
+    options = {
+        "quiet": "",
+        "page-size": "letter",
+        "encoding": "UTF-8",
+        "margin-top": "25mm",
+        "margin-left": "5mm",
+        "margin-right": "5mm",
+        "margin-bottom": "20mm",
+        "header-html": "https://storage.googleapis.com/vehice-media/header_HE.html",
+        "header-spacing": 7,
+        "header-font-size": 8,
+        "footer-html": "https://storage.googleapis.com/vehice-media/footer_HE.html",
+        "footer-spacing": 5,
+    }
+
+    url = reverse("template_consolidados_HE", kwargs={"id": id})
+    pdf_vertical = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    options["orientation"] = "Landscape"
+    url = reverse("template_consolidados_HE_diagnostic", kwargs={"id": id})
+    pdf_horizontal = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    options = {
+        "quiet": "",
+        "page-size": "letter",
+        "encoding": "UTF-8",
+        "margin-top": "0mm",
+        "margin-left": "0mm",
+        "margin-right": "0mm",
+        "margin-bottom": "0mm",
+    }
+
+    url = reverse("template_consolidados_HE_contraportada", kwargs={"id": id})
+    pdf_contraportada = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    pdf_vertical = io.BytesIO(pdf_vertical)
+    pdf_horizontal = io.BytesIO(pdf_horizontal)
+    pdf_contraportada = io.BytesIO(pdf_contraportada)
+
+    pdf_vertical_reader = PdfReader(pdf_vertical)
+    pdf_horizontal_reader = PdfReader(pdf_horizontal)
+    pdf_contraportada_reader = PdfReader(pdf_contraportada)
+    pdf_combinado_writer = PdfWriter()
+
+    index_vertical = 0
+    pagina_vertical = pdf_vertical_reader.pages
+    pdf_combinado_writer.add_page(pagina_vertical[index_vertical])
+
+    if report.methodology != None:
+        index_vertical += 1
+        pdf_combinado_writer.add_page(pagina_vertical[index_vertical])
+
+    for page in pdf_horizontal_reader.pages:
+        pagina_horizontal = page
+        pdf_combinado_writer.add_page(pagina_horizontal)
+
+    index_vertical += 1
+    for page in pdf_vertical_reader.pages[index_vertical:]:
+        pdf_combinado_writer.add_page(page)
+
+    pdf_combinado_writer.add_page(pdf_contraportada_reader.pages[0])
+
+    pdf_combinado = io.BytesIO()
+
+    pdf_combinado_writer.write(pdf_combinado)
+
+    datos_pdf_combinado = pdf_combinado.getvalue()
+
+    pdf_vertical.close()
+    pdf_horizontal.close()
+    pdf_combinado.close()
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline;filename=" + f"{no_caso}_{exam}{correlative}_{date}.pdf"
+    response.write(datos_pdf_combinado)
+
+    return response
