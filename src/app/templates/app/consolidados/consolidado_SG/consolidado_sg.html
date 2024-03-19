@@ -511,51 +511,42 @@
 
 {% autoescape off %}
 <script>
-
-document.addEventListener('DOMContentLoaded', (event) => {
-  console.log('DOMContentLoaded event fired');
-  // Select all inputs that should trigger the recalculation
-  const inputsToRecalculate = document.querySelectorAll('.recalculate-average');
-
-  // Attach an 'input' event listener to each input for real-time updates
-
-  var sampleexamresults={{sampleexamresults}};
-  var identifications = {{identifications | safe}};
-
-  console.log("s-ex-r 2",sampleexamresults);
-
-
-  inputsToRecalculate.forEach(input => {    //tiempo real
-    input.addEventListener('input', () => {
-      // Assuming these functions are defined to recalculate and update the UI accordingly
-      promedio_cages(sampleexamresults);
-      calculateIdentificationAverages(identifications);
-      calculateAveragesAC(identifications);
-      calculateCenterNameAverages(identifications);
-      calculatePromedioCellsPercentage();
-      calculateScoreRowSums(identifications);
-      // You might need to pass any necessary parameters to these functions based on your implementation
+    var sampleexamresults = {{sampleexamresults | safe}};
+    var identifications = {{identifications | safe}};
+    var result_name = "{{result_name}}";
+  
+    document.addEventListener('DOMContentLoaded', (event) => {
+      console.log('DOMContentLoaded event fired');
+      // Select all inputs that should trigger the recalculation
+      const inputsToRecalculate = document.querySelectorAll('.recalculate-average');
+  
+      // Attach an 'input' event listener to each input for real-time updates
+      console.log("s-ex-r 2",sampleexamresults);
+  
+      inputsToRecalculate.forEach(input => {    //tiempo real
+        input.addEventListener('input', () => {
+          // Assuming these functions are defined to recalculate and update the UI accordingly
+          promedio_cages(sampleexamresults);
+          calculateIdentificationAverages(identifications);
+          calculateAveragesAC(identifications);
+          calculateCenterNameAverages(identifications);
+          calculatePromedioCellsPercentage();
+          calculateScoreRowSums(identifications);
+          // You might need to pass any necessary parameters to these functions based on your implementation
+        });
+      });
+  
+      if (sampleexamresults.length > 0) {
+          console.log("s-ex-r 1", sampleexamresults);
+          load(sampleexamresults, result_name);
+          promedio_cages();
+          calculateIdentificationAverages(identifications);
+          calculateAveragesAC(identifications);
+          calculateCenterNameAverages(identifications);
+          calculatePromedioCellsPercentage(identifications);
+          calculateScoreRowSums(identifications);
+      }
     });
-  });
-
-  var sampleexamresults={{sampleexamresults}};
-  var result_name = "{{result_name}}";
-  var identifications = {{identifications | safe}};
-
-  if (sampleexamresults.length > 0) {
-
-      console.log("s-ex-r 1", sampleexamresults);
-      load(sampleexamresults, result_name);
-      promedio_cages();
-      calculateIdentificationAverages(identifications);
-      calculateAveragesAC(identifications);
-      calculateCenterNameAverages(identifications);
-      calculatePromedioCellsPercentage(identifications);
-      calculateScoreRowSums(identifications);
-
-  }
-});
-
-</script>
+  </script>
 {% endautoescape %}
 {% endblock scripts%}
