@@ -281,9 +281,4 @@ urlpatterns = [
     path("consolidado/analysis/<int:id>/methodology", csrf_exempt(views.ExamMethodologys), name="ExamMethodologys"),
     
     path("consolidado_sg/<int:form_id>/save",csrf_exempt(views.saveConsolidadoScoreGill),name="save_consolidado_sg"),
-    path("consolidado/<int:id>/template_SG", csrf_exempt(views.template_consolidados_SG), name="template_consolidados_SG"),
-    path("consolidado/<int:id>/download_SG", csrf_exempt(views.download_consolidados_SG), name="download_consolidados_SG"),
-    path("consolidado/methodology_SG", csrf_exempt(views.createMethodology_SG), name="createMethodology_SG"),
-
-
 ]
