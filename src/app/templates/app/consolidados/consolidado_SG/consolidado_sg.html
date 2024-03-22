@@ -228,11 +228,11 @@
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Congestión-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Telangiectasia Trombosis-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Hemorragia-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #acbfad;"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Protozoos{% else %}{{value.identification.id}}-optionmar-promedio{% endif %}" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Otros Parasitos-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
+                                <td style="background-color: #acbfad;"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Protozoos-promedio{% else %}{{value.identification.id}}-optionmar-promedio{% endif %}" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
+                                <td style="background-color: #acbfad;"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Hongos-promedio{% else %}{{value.identification.id}}-Otros Parasitos-promedio{% endif %}" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Zooplancton-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Microalgas-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
-                                <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Tenocibiboculum-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
+                                <td style="background-color: #acbfad;"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Flavobacterium-promedio{% else %}{{value.identification.id}}-Tenocibiboculum-promedio{% endif %}" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);"style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;"><input id="{{value.identification.id}}-Otras Bacterias-promedio" class="form-control {{value.identification.id}}-promedio" style="border: 1px solid rgb(215, 99, 99);" style="background-color: #acbfad;" type="number" min="0" max="2" value="0" readonly></td>
                                 <td style="background-color: #acbfad;" class="wide-cell"><input id="{{value.identification.id}}-Score-prom" class="form-control {{value.identification.id}}-score_prom" style="border: 1px solid rgb(215, 99, 99);"  style="background-color: #B0C4DE" type="number"   value="0" readonly></td>
                                 {% elif "promedio_center" in key %}
@@ -252,11 +252,14 @@
                                 <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Telangiectasia Trombosis" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Hemorragia" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.center}}-Protozoos{% else %}{{value.center}}-optionmar{% endif %}" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
-                                <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Otros Parasitos" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #cecdcb"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.center}}-Hongos{% else %}{{value.center}}-Otros Parasitos{% endif %}" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Zooplancton" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Microalgas" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
-                                <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Tenocibiboculum" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+                                <td style="background-color: #cecdcb"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.center}}-Flavobacterium{% else %}{{value.center}}-Tenocibiboculum{% endif %}" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
                                 <td style="background-color: #cecdcb"><input class="form-control {{value.center}}-Otras Bacterias" style="background-color: #cecdcb; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" data-center="{{value.center}}" readonly></td>
+
+
+
                                 <td style="background-color: #cecdcb"class="wide-cell"><input id="center-averages-sum" class="form-control"  style="background-color: #B0C4DE; border: 1px solid rgb(215, 99, 99);" type="number" value="0" readonly></td>
                                 {% elif "porcentaje" in key %}
                                 <th style="position: sticky; left: 0;">{{value.identification.cage}} Preval.<br>(%)</th>
@@ -273,15 +276,14 @@
                                 <td style="background-color: #f2f1ef"><input class="form-control Deg. Hidrópica-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control Congestión-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control Telangiectasia Trombosis-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
-                                <td style="background-color: #f2f1ef"><input class="form-control Hemorragia-porcentaje-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
+                                <td style="background-color: #f2f1ef"><input class="form-control Hemorragia-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}Protozoos-porcentaje{% else %}optionmar-porcentaje{% endif %}" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
-                                <td style="background-color: #f2f1ef"><input class="form-control Otros Parasitos-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
+                                <td style="background-color: #f2f1ef"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}Hongos-porcentaje{% else %}Otros Parasitos-porcentaje{% endif %}" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control Zooplancton-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control Microalgas-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
-                                <td style="background-color: #f2f1ef"><input class="form-control Tenocibiboculum-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
+                                <td style="background-color: #f2f1ef"><input class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}Flavobacterium-porcentaje{% else %}Tenocibiboculum-porcentaje{% endif %}" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef"><input class="form-control Otras Bacterias-porcentaje" style="background-color: #f2f1ef border: 1px solid rgb(45, 44, 44);" type="text" value="0%" readonly></td>
                                 <td style="background-color: #f2f1ef text-align: justify;" class="wide-cell" style="background-color: #B0C4DE; border: 1px solid rgb(215, 99, 99);" type="number" value="0" readonly>-</td>
-
                                 {% else %}
                                 <th style="position: sticky; left: 0;">{{value.identification.cage}} ({{value.index}})</th>
                                 <td style="background-color: #e0c093"><input id="{{value.id}}-Hiperplasia lamelar" class="form-control {{value.identification.id}}-Hiperplasia lamelar recalculate-average" style="background-color: #e0c093" type="number" min="0" max="3" value="0" name="{{value.id}}-Hiperplasia lamelar"></td>
@@ -298,14 +300,14 @@
                                 <td style="background-color: #cecdcb"><input id="{{value.id}}-Congestión" class="form-control {{value.identification.id}}-Congestión recalculate-average" style="background-color: #cecdcb" type="number" min="0" max="2" value="0" name="{{value.id}}-Congestión"></td>
                                 <td style="background-color: #cecdcb"><input id="{{value.id}}-Telangiectasia Trombosis" class="form-control {{value.identification.id}}-Telangiectasia Trombosis recalculate-average" style="background-color: #cecdcb" type="number" min="0" max="2" value="0" name="{{value.id}}-Telangiectasia Trombosis"></td>
                                 <td style="background-color: #cecdcb"><input id="{{value.id}}-Hemorragia" class="form-control {{value.identification.id}}-Hemorragia recalculate-average" style="background-color: #cecdcb" type="number" min="0" max="2" value="0" name="{{value.id}}-Hemorragia"></td>
-                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.id}}-optionmar{% endif %}" class="form-control recalculate-average {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Protozoos{% else %}{{value.identification.id}}-optionmar{% endif %}" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.id}}-optionmar{% endif %}"></td>
-                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Hongos {% else %}{{value.id}}-Otros Parasitos{% endif %}" class="form-control recalculate-average {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Hongos {% else %}{{value.identification.id}}-Otros Parasitos{% endif %}" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Hongos {% else %}{{value.id}}-Otros Parasitos{% endif %}"></td>
+                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.id}}-optionmar{% endif %}" class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Protozoos{% else %}{{value.identification.id}}-optionmar{% endif %} recalculate-average" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Protozoos{% else %}{{value.id}}-optionmar{% endif %}"></td>
+                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Hongos{% else %}{{value.id}}-Otros Parasitos{% endif %}" class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Hongos{% else %}{{value.identification.id}}-Otros Parasitos{% endif %} recalculate-average" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Hongos{% else %}{{value.id}}-Otros Parasitos{% endif %}"></td>
                                 <td style="background-color: #e4e3e1"><input id="{{value.id}}-Zooplancton" class="form-control {{value.identification.id}}-Zooplancton recalculate-average" style="background-color: #e4e3e1" type="number" min="0" max="2" value="0" name="{{value.id}}-Zooplancton"></td>
                                 <td style="background-color: #e4e3e1"><input id="{{value.id}}-Microalgas" class="form-control {{value.identification.id}}-Microalgas recalculate-average" style="background-color: #e4e3e1" type="number" min="0" max="2" value="0" name="{{value.id}}-Microalgas"></td>
-                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Flavobacterium {% else %}{{value.id}}-Tenocibiboculum{% endif %}" class="form-control recalculate-average {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Flavobacterium{% else %}{{value.identification.id}}-Tenocibiboculum{% endif %}" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Flavobacterium{% else %}{{value.id}}-Tenocibiboculum{% endif %}"></td>
-                                <td style="background-color: #e4e3e1"><input id="{{value.id}}-Otras Bacterias" class="form-control recalculate-average {{value.identification.id}}-Otras Bacterias" style="background-color: #e4e3e1" type="number" min="0" max="2" value="0" name="{{value.id}}-Otras Bacterias"></td>
+                                <td style="background-color: #e4e3e1"><input id="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Flavobacterium{% else %}{{value.id}}-Tenocibiboculum{% endif %}" class="form-control {% if entryform.watersource.type_of_water == 'Dulce' %}{{value.identification.id}}-Flavobacterium{% else %}{{value.identification.id}}-Tenocibiboculum{% endif %} recalculate-average" style="background-color: #e4e3e1; border: 1px solid rgb(45, 44, 44);" type="number" min="0" max="2" value="0" name="{% if entryform.watersource.type_of_water == 'Dulce' %}{{value.id}}-Flavobacterium{% else %}{{value.id}}-Tenocibiboculum{% endif %}"></td>
+                                <td style="background-color: #e4e3e1"><input id="{{value.id}}-Otras Bacterias" class="form-control {{value.identification.id}}-Otras Bacterias" style="background-color: #e4e3e1" type="number" min="0" max="2" value="0" name="{{value.id}}-Otras Bacterias"></td>
 
-                                <td style="background-color: #B0C4DE" class="wide-cell"><input   id="{{value.id}}-Score-prom-cage" class="form-control {{value.id}}-score_prom_cage"  style="background-color: #f3f2f0 ; border: 1px solid rgb(45, 44, 44);" type="number" value="0" readonly></td>
+                                <td style="background-color: #B0C4DE" class="wide-cell"><input   id="{{value.id}}-Score-prom-cage" class="form-control {{value.identification.id}}-score_prom_cage"  style="background-color: #f3f2f0 ; border: 1px solid rgb(45, 44, 44);" type="number" value="0" readonly></td>
                             {% endif %}
                             </tr>
                             {% endfor %}
@@ -341,7 +343,6 @@
     </div>
 
     <div class="chart-and-table-container">
-      <h3 class="development-notice">4. Boxplot EN DESARROLLO</h3>
       <div class="chart-container">
         <canvas id="myBoxChart"></canvas>
       </div>
@@ -350,6 +351,12 @@
 {% endblock content %}
 
 {% block scripts %}
+
+
+<script type="text/javascript">
+  // Define a global JavaScript variable for waterType
+  var waterType = "{% if entryform.watersource.type_of_water == 'Dulce' %}Dulce{% else %}Salada{% endif %}";
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Include Chart.js -->
@@ -373,9 +380,11 @@
 
 
 {% autoescape off %}
+
 <script>
 
 document.addEventListener('DOMContentLoaded', (event) => {
+
   console.log('DOMContentLoaded event fired');
   // Select all inputs that should trigger the recalculation
   const inputsToRecalculate = document.querySelectorAll('.recalculate-average');
@@ -384,9 +393,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   var sampleexamresults={{sampleexamresults}};
   var identifications = {{identifications | safe}};
-
-  console.log("s-ex-r 2",sampleexamresults);
-
+  console.log("wt"+waterType);
 
   inputsToRecalculate.forEach(input => {    //tiempo real
     input.addEventListener('input', () => {
@@ -398,7 +405,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
       calculateScoreRowSums(identifications);
       promedio_cages(sampleexamresults);
       extractDataForMixedChart(identifications);
-      extractDataForMixedChart2(identifications);
+      extractDataForMixedChart2(identifications, waterType);
+      //extractAndPrepareBoxplotDataForScores(identifications);
+      calculateBoxplotData(identifications);
+
     });
   });
 
@@ -407,9 +417,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
   var identifications = {{identifications | safe}};
 
   if (sampleexamresults.length > 0) {
-
       //console.log("s-ex-r 1", sampleexamresults);
-      load(sampleexamresults, result_name); // llena las celdas 'individuales', numeros fijos. No los promedios.
+      load(sampleexamresults, result_name, waterType); // llena las celdas 'individuales', numeros fijos. No los promedios.
       calculateIdentificationAverages(identifications); //saca los promedios de los numeros fijos (las celdas verdes)
       //calculateAveragesAC(identifications); // al parecer no se necesitaba, estaba mal el orden de funcs
       calculateCenterNameAverages(identifications); // promedio centros (promedio de los 3 verdes)
@@ -417,7 +426,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
       calculateScoreRowSums(identifications); //calcula el score de las cells verdes
       promedio_cages(); //calcula los score (cells morado claro)
       extractDataForMixedChart(identifications);
-      extractDataForMixedChart2(identifications);
+      extractDataForMixedChart2(identifications, waterType);
+      //extractAndPrepareBoxplotDataForScores(identifications);
+      calculateBoxplotData(identifications);
   }
 });
 

@@ -75,20 +75,34 @@ if (clear) {
 }
 
 
-// Arreglar id bug
-// mostrar valores guardados
-function load(sampleexamresults, result_name) {
-var select_result = document.getElementsByName("mar_opcional")[0];
-select_result.value = result_name
 
-sampleexamresults.forEach(function (sampleexamresult) {
-  var input = document.getElementById(`${sampleexamresult.sample_id}-${sampleexamresult.result}`);
-  if(input==null){
-    input = document.getElementsByName(`${sampleexamresult.sample_id}-optionmar`)[0];
+function load(sampleexamresults, result_name, waterType) {
+
+
+  var select_result = document.getElementsByName("mar_opcional")[0];
+
+  // Check if the select element exists before setting its value
+  if (select_result) {
+    select_result.value = result_name;
+  } else {
+    console.warn("Select element 'mar_opcional' not found.");
   }
-  input.value = sampleexamresult.value;
-});
-}
+
+  sampleexamresults.forEach(function (sampleexamresult) {
+    console.log("sampleexamresult",sampleexamresult);
+    console.log("sampleexamresults_sampleid",sampleexamresult.sample_id);
+    var input = document.getElementById(`${sampleexamresult.sample_id}-${sampleexamresult.result}`);
+    console.log("input", input);
+    //console.log("Input mar_opcional: " + input)
+    if(input==null){
+      input = document.getElementsByName(`${sampleexamresult.sample_id}-optionmar`)[0];
+      ("if input null", input)
+      //console.log("Input OptionMar: " + input)
+    }
+    input.value = sampleexamresult.value;
+  });
+  }
+
 
 function calculateIdentificationAverages(identifications) {
   //console.log('Starting calculateIdentificationAverages with identifications:', identifications);
@@ -134,12 +148,13 @@ function calculateIdentificationAverages(identifications) {
 
 let myChart; // Declare myChart at a higher scope so it can be accessed by generateChart
 
+let myBoxChartInstance = null;
 
 function generateChartProms(data, labels, centerAverage, centerName) {
   // Log the data to ensure it's correct
-  console.log('Data:', data);
-  console.log('Labels:', labels);
-  console.log('Center Average:', centerAverage);
+  //console.log('Data:', data);
+  //console.log('Labels:', labels);
+  //console.log('Center Average:', centerAverage);
 
   const ctx = document.getElementById('myChart').getContext('2d');
 
@@ -326,8 +341,6 @@ function generateChartProms(data, labels, centerAverage, centerName) {
   }
 }
 
-
-
 function calculateScoreRowSums(identifications) {
 
   const categorySums = {};
@@ -382,7 +395,7 @@ function calculateScoreRowSums(identifications) {
 
     const sum = categorySums[categoryId];
     const scoreRow = document.getElementsByClassName(`${categoryId}-score_prom`)[0];
-    console.log(`ScoreRow:`, scoreRow);
+    //console.log(`ScoreRow:`, scoreRow);
     if (scoreRow) {
       scoreRow.value = sum.toFixed(1); // Update the scoreRow value
       scoreRowValues.push(parseFloat(scoreRow.value)); // Collect the value for the chart
@@ -394,8 +407,8 @@ function calculateScoreRowSums(identifications) {
 
 
   // Ensure that you have values and labels for each score_prom
-  console.log('Score Prom Values:', scoreRowValues);
-  console.log('Labels:', labels);
+  //console.log('Score Prom Values:', scoreRowValues);
+  //console.log('Labels:', labels);
 
   // Now, you have scorePromValues and labels ready to be used in the chart
   // Assuming calculateCenterNameAverages has already been called and the center average is updated in an element with id 'center-averages-sum'
@@ -404,6 +417,7 @@ function calculateScoreRowSums(identifications) {
 
 
   generateChartProms(scoreRowValues, labels, centerAverage, centerName);
+
 }
 
 function calculateCenterNameAverages(identifications) {
@@ -466,18 +480,44 @@ function calculatePromedioCellsPercentage() {
     'Congestión',
     'Trombosis',
     'Hemorragia',
-    'optionmar',
-    'Otros Parasitos',
+    // Protozoos / optionmar
+    // Hongos / Otros Parasitos
     'Zooplancton',
     'Microalgas',
-    'Tenocibiboculum',
+    // Flavobacterium / Tenocibiboculum
     'Otras Bacterias',
-    // Add other categories as needed
   ];
+
+  // Dynamically add 'optionmar' or 'Protozoos' based on the presence of elements in the document
+  const protozoosElements = document.querySelectorAll('.Protozoos-porcentaje');
+  const optionmarElements = document.querySelectorAll('.optionmar-porcentaje');
+  const HongosElements = document.querySelectorAll('.Hongos-porcentaje');
+  const OtrosParsElements = document.querySelectorAll('[class*="Otros Parasitos-porcentaje"]');
+  const FlavobacteriumElements = document.querySelectorAll('.Flavobacterium-porcentaje');
+  const TenocibiboculumElements = document.querySelectorAll('.Tenocibiboculum-porcentaje');
+
+  console.log("elements",optionmarElements,OtrosParsElements)
+
+  if (protozoosElements.length > 0)
+    categories.push('Protozoos');
+  if (optionmarElements.length > 0)
+    categories.push('optionmar');
+  if (HongosElements.length > 0)
+    categories.push('Hongos');
+  if (OtrosParsElements.length > 0)
+    categories.push('Otros Parasitos');
+  if (TenocibiboculumElements.length > 0)
+    categories.push('Tenocibiboculum');
+  if (FlavobacteriumElements.length > 0)
+    categories.push('Flavobacterium');
+
+
+  console.log(categories)
   categories.forEach(category => {
 
     categoryClass = category;
     //console.log(`Using class selector: ${categoryClass}`);
+    //console.log(categoryClass);
 
     // Select all input cells for the category, excluding percentage cells
     const inputCellsSelector = `input[class*="${categoryClass}"]:not([data-center])`;
@@ -585,25 +625,21 @@ function promedio_cages() {
       sumBySampleId[sample_id] += value;
       //console.log(`Updated sumBySampleId for ${sample_id}: ${sumBySampleId[sample_id]}`);
   });
-  console.log("valuesBySampleId", valuesBySampleId);
-  prepareBoxplotData(valuesBySampleId);
 
-  // Update the UI based on sumBySampleId for other results
+  // Update the UI based on sumBySampleId f or other results
   Object.keys(sumBySampleId).forEach(sample_id => {
       const inputElement = document.getElementById(`${sample_id}-Score-prom-cage`);
       if (inputElement) {
           inputElement.value = sumBySampleId[sample_id];
-          console.log(`Updated UI for ${sample_id}: ${sumBySampleId[sample_id]}`);
+         // console.log(`Updated UI for ${sample_id}: ${sumBySampleId[sample_id]}`);
       } else {
-          console.log(`Could not find input element for ${sample_id}-Score-prom-cage`);
+          //console.log(`Could not find input element for ${sample_id}-Score-prom-cage`);
       }
   });
 
 }
 
 //---------------------------MixedChart Hallazgos Principales-------------------------------------
-
-
 
 function extractDataForMixedChart(identifications) {
   // Define objects to hold the data for each category keyed by cage name
@@ -640,7 +676,7 @@ function extractDataForMixedChart(identifications) {
 
   // Assuming 'center-averages-sum' is an input element containing the center average valu
   const centerName = document.querySelector('[data-center]').getAttribute('data-center');
-  console.log(centerName);
+  //console.log(centerName);
 
   // Assuming the center averages are stored with IDs like 'centerName-Hiperplasia lamelar-promedio'
   const categories = ['Hiperplasia lamelar', 'Fusión lamelar', 'Anormalidades celulares', 'Edema lamelar'];
@@ -649,7 +685,7 @@ function extractDataForMixedChart(identifications) {
 
 
     const centerAverageElement = document.querySelector(`input[data-center='${centerName}'][class*='${category}']`);
-    console.log(centerAverageElement);
+    //console.log(centerAverageElement);
     return centerAverageElement ? parseFloat(centerAverageElement.value) || 0 : 0;
   });
 // Now you have the center averages for each category, you can generate the chart
@@ -757,9 +793,8 @@ function createDataTableMixedChart(cageNames, hiperplasiaLamelarData, fusionLame
 
 //---------------------------MixedChart Criterio Auxiliar-------------------------------------
 
-function extractDataForMixedChart2(identifications) {
+function extractDataForMixedChart2(identifications, waterType) {
   // Define objects to hold the data for each category keyed by cage name
-  console.log("hola")
 
   let inflamacion = {};
   let cge = {};
@@ -767,16 +802,19 @@ function extractDataForMixedChart2(identifications) {
   let congestion = {};
   let telangiectasiaTrombosis = {};
   let hemorragia = {};
-  let optionmar = {};
-  let otrosParasitos = {};
+  //let optionmar = {};
+  let protozoosOrMar = {};
+  let hongosOrOtrosPars = {};
   let zooplancton = {};
   let microalgas = {};
-  let tenocibiboculum = {};
+  let flavoOrTeno = {};
   let otrasBacterias = {};
   let cageNames = [];
 
   // Collect cage names
   const cageNameElements = document.querySelectorAll('th[data-cage-name]');
+
+
 
   cageNameElements.forEach((th) => {
     const cageName = th.getAttribute('data-cage-name');
@@ -788,11 +826,12 @@ function extractDataForMixedChart2(identifications) {
     congestion[cageName] = 0;
     telangiectasiaTrombosis[cageName] = 0;
     hemorragia[cageName] = 0;
-    optionmar[cageName] = 0;
-    otrosParasitos[cageName] = 0;
+    //optionmar[cageName] = 0;
+    protozoosOrMar[cageName] = 0;
+    hongosOrOtrosPars[cageName] = 0;
     zooplancton[cageName] = 0;
     microalgas[cageName] = 0;
-    tenocibiboculum[cageName] = 0;
+    flavoOrTeno[cageName] = 0;
     otrasBacterias[cageName] = 0;
   });
 
@@ -802,7 +841,17 @@ function extractDataForMixedChart2(identifications) {
     const cageName = identification.cage; // Assuming 'cage' is a property of 'identification'
     const idPrefix = identification.id; // This is the prefix used in the ID of the average cells
 
+
+    // Adjusted to include conditional logic for water type
+    const protozoosOrMarId = waterType === 'Dulce' ? `${idPrefix}-Protozoos-promedio` : `${idPrefix}-optionmar-promedio`;
+    const hongosOrOtrosParsId = waterType === 'Dulce' ? `${idPrefix}-Hongos-promedio` : `${idPrefix}-Otros Parasitos-promedio`;
+    const flavoOrTenoId = waterType === 'Dulce' ? `${idPrefix}-Flavobacterium-promedio` : `${idPrefix}-Tenocibiboculum-promedio`;
+
+
+
     // Use the idPrefix to build the ID for the average inputs and extract their values
+
+
 
     inflamacion[cageName] = parseFloat(document.getElementById(`${idPrefix}-Inflamación-promedio`).value) || 0;
     cge[cageName] = parseFloat(document.getElementById(`${idPrefix}-CGE-promedio`).value) || 0;
@@ -810,11 +859,13 @@ function extractDataForMixedChart2(identifications) {
     congestion[cageName] = parseFloat(document.getElementById(`${idPrefix}-Congestión-promedio`).value) || 0;
     telangiectasiaTrombosis[cageName] = parseFloat(document.getElementById(`${idPrefix}-Telangiectasia Trombosis-promedio`).value) || 0;
     hemorragia[cageName] = parseFloat(document.getElementById(`${idPrefix}-Hemorragia-promedio`).value) || 0;
-    optionmar[cageName] = parseFloat(document.getElementById(`${idPrefix}-optionmar-promedio`).value) || 0;
-    otrosParasitos[cageName] = parseFloat(document.getElementById(`${idPrefix}-Otros Parasitos-promedio`).value) || 0;
+    //optionmar[cageName] = parseFloat(document.getElementById(`${idPrefix}-optionmar-promedio`).value) || 0;
+    protozoosOrMar[cageName] = parseFloat(document.getElementById(protozoosOrMarId).value) || 0;
+    hongosOrOtrosPars[cageName] = parseFloat(document.getElementById(hongosOrOtrosParsId).value) || 0;
+    //otrosParasitos[cageName] = parseFloat(document.getElementById(`${idPrefix}-Otros Parasitos-promedio`).value) || 0;
     zooplancton[cageName] = parseFloat(document.getElementById(`${idPrefix}-Zooplancton-promedio`).value) || 0;
     microalgas[cageName] = parseFloat(document.getElementById(`${idPrefix}-Microalgas-promedio`).value) || 0;
-    tenocibiboculum[cageName] = parseFloat(document.getElementById(`${idPrefix}-Tenocibiboculum-promedio`).value) || 0;
+    flavoOrTeno[cageName] = parseFloat(document.getElementById(flavoOrTenoId).value) || 0;
     otrasBacterias[cageName] = parseFloat(document.getElementById(`${idPrefix}-Otras Bacterias-promedio`).value) || 0;
   });
 
@@ -822,7 +873,7 @@ function extractDataForMixedChart2(identifications) {
 
   // Assuming 'center-averages-sum' is an input element containing the center average value
   const centerName = document.querySelector('[data-center]').getAttribute('data-center');
-  console.log(centerName);
+  //console.log(centerName);
 
   // Assuming the center averages are stored with IDs like 'centerName-Hiperplasia lamelar-promedio'
   const categories = ['Inflamación','CGE','Deg. Hidrópica','Congestión','Telangiectasia Trombosis','Hemorragia','optionmar','Otros Parasitos','Zooplancton','Microalgas','Tenocibiboculum','Otras Bacterias'];
@@ -830,11 +881,11 @@ function extractDataForMixedChart2(identifications) {
   const centerAverages = categories.map(category => {
     //const centerAverageElement = document.getElementById(`${centerName}'-'${category}`);
     const centerAverageElement = document.querySelector(`input[data-center='${centerName}'][class*='${category}']`);
-    console.log("cAveragte",centerAverageElement);
+    //console.log("cAveragte",centerAverageElement);
     return centerAverageElement ? parseFloat(centerAverageElement.value) || 0 : 0;
   });
 // Now you have the center averages for each category, you can generate the chart
-  generateMixedChart2(cageNames, inflamacion, cge, degHidropica, congestion, telangiectasiaTrombosis, hemorragia, optionmar, otrosParasitos, zooplancton, microalgas, tenocibiboculum, otrasBacterias, centerAverages, centerName);
+  generateMixedChart2(cageNames, inflamacion, cge, degHidropica, congestion, telangiectasiaTrombosis, hemorragia, protozoosOrMar, hongosOrOtrosPars, zooplancton, microalgas, flavoOrTeno, otrasBacterias, centerAverages, centerName);
 
 }
 
@@ -953,119 +1004,115 @@ function createDataTableMixedChart2(cageNames, inflamacion, cge, degHidropica, c
   document.getElementById('chartDataTable2').innerHTML = table;
 }
 
+//---------------------------BOXPLOT -------------------------------------//
 
-
-
-//---------------------------BOXPLOT -------------------------------------
-function prepareBoxplotData(valuesByCategory) {
-  const boxplotData = Object.keys(valuesByCategory).map(category => {
-    const values = valuesByCategory[category].sort((a, b) => a - b);
-    const min = values[0];
-    const max = values[values.length - 1];
-    const median = calculateMedian(values);
-    const q1 = calculateQuartile(values, 0.25);
-    const q3 = calculateQuartile(values, 0.75);
-    const outliers = calculateOutliers(values); // Implement based on your criteria
-
-    return {
-      category,
-      min,
-      q1,
-      median,
-      q3,
-      max,
-      outliers
-    };
-  });
-
-
-  return generateChartPromsBoxed(boxplotData);
-}
-
-function generateChartPromsBoxed(data, labels) {
-  // Ensure the Chart.js and the boxplot plugin are correctly imported
-  // For ES modules, you would typically import these at the top of your file:
-  // import Chart from 'chart.js/auto';
-  // import 'chartjs-chart-box-and-violin-plot';
-
-  const ctx3 = document.getElementById('myBoxChart').getContext('2d');
-
-  // Assuming 'data' is correctly formatted for the boxplot chart
-  // The data format for a boxplot typically includes min, q1, median, q3, max, and outliers for each dataset
-
-  // Chart options
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true
-      },
-      tooltip: {
-        enabled: true
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
+function calculateBoxplotData(identifications) {
+  let boxplotData = {
+    allScores: [] // Initialize a key to hold all scores across cages
   };
 
-  // Check if the chart instance already exists
-  if (window.myBoxChart instanceof Chart) {
-    window.myBoxChart.data.labels = labels;
-    window.myBoxChart.data.datasets[0].data = data;
-    window.myBoxChart.update();
-  } else {
-    // Create a new boxplot chart instance
-    window.myBoxChart = new Chart(ctx3, {
-      type: 'boxplot', // Specify the chart type as 'boxplot'
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Score Promedio de Salud Branquial (0-24)',
-          backgroundColor: 'rgba(1, 99, 132, 0.5)',
-          borderColor: 'rgba(2, 9, 1, 1)',
-          borderWidth: 1,
-          outlierColor: '#999999',
-          padding: 10,
-          itemRadius: 0,
-          data: data // The structured data for the boxplot
-        }]
-      },
-      options: chartOptions
-    });
-  }
+  //console.log("id",identifications)
+
+  // Initialize boxplotData with main cage categories
+  identifications.forEach(identification => {
+    boxplotData[identification.cage] = [];
+  });
+
+  // Select all score input elements
+  const scoreInputs = document.querySelectorAll('input[id$="-Score-prom-cage"]'); // Selects inputs where id ends with '-Score-prom-cage'
+  //console.log("scoreInputs",scoreInputs)
+
+  // Iterate over each score input to group scores by main cage category
+  scoreInputs.forEach(input => {
+    const score = parseFloat(input.value);
+    if (!isNaN(score)) {
+      // Extract the identification ID from the input's ID
+      const classParts = input.className.split(' '); // Split by space to get all classes
+      //console.log("classParts",classParts)
+      const cageClass = classParts.find(cls => cls.includes('score_prom_cage')); // Replace 'cage-identifier' with the actual part of the class that contains the cage identifier
+      //console.log("cageClass",cageClass)
+
+      if (cageClass) {
+        const cageIdentifierParts = cageClass.split('-'); // Assuming the format is something like 'cage-identifier-123'
+        //console.log("cageIdentifierParts",cageIdentifierParts)
+        const cageIdentifier = cageIdentifierParts[0]; // Get the last part as the identifier
+        //console.log("cageIdentifier",cageIdentifier)
+
+        // Find the corresponding cage name that matches the cage identifier
+        const identification = identifications.find(id => id.id.toString() === cageIdentifier);
+
+        if (identification) {
+          // Push the score into the array for the main cage category
+          boxplotData[identification.cage].push(score);
+        }
+      }
+      // Additionally, push the score into the allScores array
+      boxplotData.allScores.push(score)
+    }
+  });
+  // Log the collected data
+  //console.log("boxplotData", boxplotData);
+  generateBoxplot(boxplotData);
 }
 
-// Example helper function to calculate the median
-function calculateMedian(values) {
-  const half = Math.floor(values.length / 2);
-  if (values.length % 2) return values[half];
-  return (values[half - 1] + values[half]) / 2.0;
-}
-
-function calculateQuartile(values, q) {
-  const pos = (values.length - 1) * q;
-  const base = Math.floor(pos);
-  const rest = pos - base;
-
-  if (values[base + 1] !== undefined) {
-    return values[base] + rest * (values[base + 1] - values[base]);
-  } else {
-    return values[base];
-  }
-}
-
-function calculateOutliers(values) {
-  const q1 = calculateQuartile(values, 0.25);
-  const q3 = calculateQuartile(values, 0.75);
+function computeBoxplotStats(values) {
+  const sortedValues = values.slice().sort((a, b) => a - b);
+  const q1 = sortedValues[Math.floor((sortedValues.length / 4))];
+  // For median, handle the case of odd and even length arrays
+  const median = sortedValues.length % 2 === 0 ?
+    (sortedValues[sortedValues.length / 2 - 1] + sortedValues[sortedValues.length / 2]) / 2 :
+    sortedValues[Math.floor(sortedValues.length / 2)];
+  const q3 = sortedValues[Math.ceil((sortedValues.length * (3 / 4))) - 1];
   const iqr = q3 - q1;
-  const lowerBound = q1 - 1.5 * iqr;
-  const upperBound = q3 + 1.5 * iqr;
+  const min = q1 - 1.5 * iqr;
+  const max = q3 + 1.5 * iqr;
 
-  return values.filter(value => value < lowerBound || value > upperBound);
+  return { min, q1, median, q3, max };
 }
+
+function generateBoxplotDataForChart(boxplotData) {
+  // Assuming boxplotData is structured with keys as labels and values as arrays of scores
+  const datasets = [{
+    label: 'Boxplot Data',
+    data: Object.values(boxplotData), // Directly use the arrays of scores
+    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+    borderColor: 'rgba(0, 123, 255, 1)',
+  }];
+
+  return {
+    labels: Object.keys(boxplotData), // Use the category names as labels
+    datasets: datasets
+  };
+}
+
+function generateBoxplot(rawBoxplotData) {
+  const ctx = document.getElementById('myBoxChart').getContext('2d');
+  const dataForChart = generateBoxplotDataForChart(rawBoxplotData);
+
+  // Destroy the existing chart instance if it exists
+  if (myBoxChartInstance) {
+    myBoxChartInstance.destroy();
+  }
+
+  // Create a new chart instance
+  myBoxChartInstance = new Chart(ctx, {
+    type: 'boxplot',
+    data: dataForChart,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Score'
+          }
+        }
+      }
+    },
+  });
+}
+
 
 //----------------------------------------------------------------//
 function calculateAveragesAC(identifications) {  // AC = Anormalidades Celular
