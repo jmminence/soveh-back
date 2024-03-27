@@ -74,7 +74,7 @@
         background-color: #fcbaba;
     }
 
-    tbody .sticky tr:nth-child(2n) {background: #f2f2f2 !important;}
+      tbody .sticky tr:nth-child(2n) {background: #f2f2f2 !important;}
 
     .custom-file-input:lang(en) ~ .custom-file-label::after {
         content: "Seleccionar";
@@ -90,7 +90,7 @@
       }
 
 
-      .form-control{
+    .form-control{
         width: 80%;
     }
 
@@ -121,6 +121,31 @@
     .data-table-container {
       width: 90vw; /* Match the width of the chart for alignment */
       overflow-x: auto; /* Allows table to be scrollable horizontally if it's too wide */
+    }
+
+    .row-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 20px; /* This creates space between the flex items */
+    }
+    .chart-and-table-container {
+      flex: 1 1 calc(50% - 40px); /* Adjust the 20px if you need more or less space between the items */
+      margin-bottom: 20px; /* Space below each chart and table */
+    }
+    .chart-and-table-container {
+      border: 3px solid rgba(255, 164, 000, 0.4); /* Blue color with 50% opacity */
+      padding: 10px; /* Adds some padding inside the border */
+      box-sizing: border-box; /* Ensures padding and border are included in the total width and height */
+    }
+    .chart-container, .data-table-container {
+      width: 100%; /* Ensures that the chart containers take up the full width of their parent */
+      margin-bottom: 10px; /* Optional: Adds space between your chart and table if they are in the same container */
+    }
+    canvas {
+      width: 100% !important; /* Ensures that the canvas (chart) is responsive and fits within its container */
+      max-width: 100%; /* Prevents the canvas from stretching beyond its container's width */
+      height: auto !important; /* Adjusts the height automatically based on the width to maintain aspect ratio */
     }
 </style>
 
@@ -480,31 +505,35 @@
           });
       });
       </script>
-    <div class="chart-and-table-container">
-      <div class="chart-container">
-        <canvas id="myChart"></canvas>
-      </div>
+<div class="row-flex">
+  <div class="chart-and-table-container">
+    <div class="chart-container">
+      <canvas id="myChart"></canvas>
     </div>
+  </div>
 
-    <div class="chart-and-table-container">
-      <div class="chart-container">
-        <canvas id="myMixedChart"></canvas>
-      </div>
-      <div id="chartDataTable" class="data-table-container"></div>
+  <div class="chart-and-table-container">
+    <div class="chart-container">
+      <canvas id="myMixedChart"></canvas>
     </div>
+    <div id="chartDataTable" class="data-table-container"></div>
+  </div>
+</div>
 
-    <div class="chart-and-table-container">
-      <div class="chart-container">
-        <canvas id="myMixedChart2"></canvas>
-      </div>
-     <div id="chartDataTable2" class="data-table-container"></div>
+<div class="row-flex">
+  <div class="chart-and-table-container">
+    <div class="chart-container">
+      <canvas id="myMixedChart2"></canvas>
     </div>
+    <div id="chartDataTable2" class="data-table-container"></div>
+  </div>
 
-    <div class="chart-and-table-container">
-      <div class="chart-container">
-        <canvas id="myBoxChart"></canvas>
-      </div>
+  <div class="chart-and-table-container">
+    <div class="chart-container">
+      <canvas id="myBoxChart"></canvas>
     </div>
+  </div>
+</div>
 
 {% endblock content %}
 

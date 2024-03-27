@@ -1391,7 +1391,7 @@ $("#report_edit").on("submit", async function (event) {
       processData: false,
       contentType: false,
       success: function (data) {
-        window.open(Urls.download_consolidados_HE(id), "_blank");
+        window.open(Urls.download_consolidados_SG(id), "_blank");
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error(errorThrown);

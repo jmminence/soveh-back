@@ -4511,7 +4511,7 @@ class ConsolidadosBase(View):
         elif analysisform.exam.name == "SCORE_GILL":
             context, route = consolidadoScoreGill(form_id)
         return render(request, route, context)
-    
+
 
 
 def getConsolidadoHe(form_id):
@@ -4571,7 +4571,7 @@ def getConsolidadoHe(form_id):
                 "id": result.id,
                 "resultado": result.result,
                 "organo": result.organ.name
-            }) 
+            })
         route = "app/consolidados/consolidado_HE/consolidado_he.html"
         return context, route
 
@@ -4931,6 +4931,8 @@ def new_order(new_order):
         image.save()
 
 
+## H&E
+
 def template_consolidados_HE(request, id):
     analysis = Analysis.objects.get(id=id)
 
@@ -5203,7 +5205,6 @@ def template_consolidados_HE_diagnostic(request, id):
 
     return render(request, "app/consolidados/consolidado_HE/diagnostic_page.html", context)
 
-
 def template_consolidados_HE_contraportada(request, id):
     analysis = Analysis.objects.get(id=id)
     contraportada = "/static/assets/images/contraportada.jpg"
@@ -5220,7 +5221,7 @@ def template_consolidados_HE_contraportada(request, id):
         contraportada = "/static/assets/images/contraportada_HE Vertebra.jpg"
     elif analysis.exam.id == 74:
         contraportada = "/static/assets/images/contraportada_score_gill.jpg"
-        
+
     context= {
         "contraportada":contraportada,
     }
@@ -5315,6 +5316,388 @@ def download_consolidados_HE(request, id):
 
     return response
 
+#SCOREGILL
+
+def template_consolidados_SG(request, id):
+
+    analysis = Analysis.objects.get(id=id)
+
+    analysisSampleExmanResults = AnalysisSampleExmanResult.objects.filter(analysis_id=id)
+    analysisSampleExmanResults = sorted(analysisSampleExmanResults, key=lambda x: x.sample_exam_result.result_organ.organ.name)
+
+    analysis_report = AnalysisReport.objects.get(analysis_id=id)
+
+    if analysis.research_set.all():
+        research = True
+    else:
+        research = False
+
+    no_caso = analysis.entryform.no_caso
+    exam = analysis.exam.abbreviation
+    #no_reporte_date = analysis_report.report_date.strftime('%d%m%y')
+    correlative = "{:02d}".format(analysis_report.correlative)
+
+    #no_reporte = f'{no_caso}_{exam}{correlative}_{no_reporte_date}'
+    identifications = Identification.objects.filter(entryform__no_caso=no_caso)
+
+    identifications_group_empty = True
+    for identification in identifications:
+        if identification.group != "":
+            identifications_group_empty = False
+
+    samples = Sample.objects.filter(
+        entryform=analysis.entryform
+    ).values_list("id", flat=True)
+    sampleExams = SampleExams.objects.filter(
+          sample__in=samples, exam=analysis.exam, stain=analysis.stain
+          )
+    organs_count = samples_count = len(sampleExams)
+    if analysis.exam.pricing_unit == 1:
+            samples_count = organs_count
+    else:
+        sampleExams = SampleExams.objects.filter(
+            sample__in=samples, exam=analysis.exam, stain=analysis.stain
+        ).values_list("sample_id", flat=True)
+        samples_count = len(list(set(sampleExams)))
+
+    sampleExams = SampleExams.objects.filter(sample__in=samples, exam=analysis.exam, stain=analysis.stain)
+    samples=[]
+
+    identifications_filter = []
+    for sampleExam in sampleExams:
+        sample = Sample.objects.get(id=sampleExam.sample.id)
+
+        identification = identifications.filter(id=sample.identification.id)[0]
+        if identification not in identifications_filter and not any(iden.cage == identification.cage and iden.weight == identification.weight for iden in identifications_filter):
+            identifications_filter.append(identification)
+
+        if sample not in samples:
+            samples.append(sample)
+
+    samples = sorted(samples, key=lambda x: x.index)
+
+    sample_charge = analysis.samples_charged if analysis.samples_charged != None and analysis.samples_charged > 0 else  samples_count
+
+    reportImages = analysis_report.reportimages_set.all().order_by('index')
+
+    pathologist = ""
+    if analysis.patologo:
+        pathologist = f"{analysis.patologo.first_name} {analysis.patologo.last_name}"
+
+
+
+
+    if analysis_report.methodology != None:
+
+        methodology = {
+            "id":analysis_report.methodology.id,
+            "name":analysis_report.methodology.name,
+            "description":analysis_report.methodology.description,
+            "image":[],
+        }
+
+        for image in MethodologyImage.objects.filter(methodology=analysis_report.methodology).order_by("index"):
+            methodology_image = {
+                "id":image.id,
+                "comment":image.comment,
+                "size":image.size,
+                "url":image.imagen.url
+            }
+            methodology["image"].append(methodology_image)
+    else:
+        methodology = ""
+
+    context = {
+        "no_caso": no_caso,
+        #"no_reporte": no_reporte,
+        "research": research,
+        "pathologist": pathologist,
+        "customer": analysis.entryform.customer.name,
+        "center": analysis.entryform.center,
+        "specie": analysis.entryform.specie.name,
+        "larvalstage": analysis.entryform.larvalstage.name,
+        "watersource": analysis.entryform.watersource.name,
+        "identifications": identifications_filter,
+        "identifications_group_empty":identifications_group_empty,
+        #"fecha_recepcion": analysis.created_at.strftime('%d-%m-%Y'),
+        #"fecha_informe": analysis_report.report_date.strftime('%d-%m-%Y'),
+        #"fecha_muestreo": analysis.entryform.sampled_at.strftime('%d-%m-%Y') if analysis.entryform.sampled_at != None else "-",
+        "sample_charge": f'{sample_charge} {analysis.exam.name}',
+        "anamnesis": analysis_report.anamnesis,
+        "comment": analysis_report.comment,
+        "etiological_diagnostic": analysis_report.etiological_diagnostic,
+        "samples":samples,
+        "reportImages": reportImages,
+        "methodology":methodology,
+    }
+
+
+    return render(request, "app/consolidados/consolidado_SG/template_consolidado_SG.html")
+
+def template_consolidados_SG_diagnostic(request, id):
+    analysis = Analysis.objects.get(id=id)
+    identifications_filter = []
+
+    analysisSampleExmanResults = AnalysisSampleExmanResult.objects.filter(analysis_id=id)
+    analysisSampleExmanResults = sorted(analysisSampleExmanResults, key=lambda x: x.sample_exam_result.result_organ.organ.name)
+
+    identifications = Identification.objects.filter(entryform=analysis.entryform)
+
+    samples = Sample.objects.filter(
+        entryform=analysis.entryform
+    ).values_list("id", flat=True)
+    sampleExams = SampleExams.objects.filter(
+          sample__in=samples, exam=analysis.exam, stain=analysis.stain
+          )
+
+    samples=[]
+    for sampleExam in sampleExams:
+            sample = Sample.objects.get(id=sampleExam.sample.id)
+            identification = identifications.filter(id=sample.identification.id)[0]
+            if identification not in identifications_filter:
+                identifications_filter.append(identification)
+
+            if sample not in samples:
+                samples.append(sample)
+
+    samples = sorted(samples, key=lambda x: x.index)
+
+    context = {
+        "calspan_identifications": len(samples),
+        "identifications":[],
+        "samples":samples,
+        "diagnostics":[],
+    }
+
+    for identification in identifications_filter:
+        colspan = len(identification.sample_set.all())
+
+        samplesExams_identification = sampleExams.filter(sample__identification=identification)
+
+        sample_count =[]
+        for sampleExam in samplesExams_identification:
+            sample_identification = Sample.objects.get(id=sampleExam.sample.id)
+            if sample_identification not in sample_count:
+                sample_count.append(sample_identification)
+
+        sample_count = sorted(sample_count, key=lambda x: x.index)
+        colspan = len(sample_count)
+
+        context["identifications"].append({
+            "cage":identification.cage,
+            "colspan": colspan,
+        })
+
+    diagnostic=[]
+    index=0
+    samples_afected = 0
+    total_samples = 0
+    organ=[]
+    organ_rowspan=1
+    for analysisSampleExmanResult in analysisSampleExmanResults:
+        if analysisSampleExmanResult.sample_exam_result.result_organ not in diagnostic:
+            samples_afected = 0
+            total_samples = 0
+            if analysisSampleExmanResult.sample_exam_result.value > 0:
+                samples_afected += 1
+
+            index+=1
+            diagnostic.append(analysisSampleExmanResult.sample_exam_result.result_organ)
+            context["diagnostics"].append({
+                "organ":analysisSampleExmanResult.sample_exam_result.result_organ.organ.name,
+                "diagnostic": analysisSampleExmanResult.sample_exam_result.result_organ.result.name,
+                "distribution": analysisSampleExmanResult.sample_exam_result.distribution,
+                "results":{analysisSampleExmanResult.sample_exam_result.sample_exam.sample.index:analysisSampleExmanResult.sample_exam_result.value},
+                "samples_afected": samples_afected,
+            })
+
+        else:
+            if analysisSampleExmanResult.sample_exam_result.value > 0:
+                samples_afected += 1
+
+            context["diagnostics"][index-1]["results"][analysisSampleExmanResult.sample_exam_result.sample_exam.sample.index] = analysisSampleExmanResult.sample_exam_result.value
+            context["diagnostics"][index-1]["samples_afected"] = samples_afected
+
+        if analysisSampleExmanResult.sample_exam_result.value >= 0:
+            total_samples += 1
+            context["diagnostics"][index-1]["total_samples"] = total_samples
+
+        if total_samples == 0:
+            samples_afected_percentage = 0
+        else:
+            samples_afected_percentage = round((samples_afected*100)/total_samples)
+
+        context["diagnostics"][index-1]["samples_afected_percentage"]=samples_afected_percentage
+
+    organ = ""
+    diagnostics=[]
+    diagnostics_final=[]
+    for i in range(len(context["diagnostics"])):
+        if context["diagnostics"][i]["organ"] != organ:
+            organ=context["diagnostics"][i]["organ"]
+            diagnostics=[]
+            diagnostics.append(context["diagnostics"][i])
+
+            try:
+                if context["diagnostics"][i+1]["organ"] != organ:
+                    diagnostics_final.append(diagnostics[0])
+
+            except IndexError:
+                diagnostics_final.append(diagnostics[0])
+        else:
+            diagnostics.append(context["diagnostics"][i])
+
+            try:
+                if context["diagnostics"][i+1]["organ"] != organ:
+                    diagnostics.sort(key=lambda e: e["samples_afected_percentage"],reverse=True)
+                    for diagnostic in diagnostics:
+                        diagnostics_final.append(diagnostic)
+
+            except IndexError:
+                diagnostics.sort(key=lambda e: e["samples_afected_percentage"],reverse=True)
+                for diagnostic in diagnostics:
+                    diagnostics_final.append(diagnostic)
+
+    context["diagnostics"] = diagnostics_final
+
+    organ = ""
+    organ_rowspan=0
+    for i in range(len(context["diagnostics"])):
+        if context["diagnostics"][i]["organ"] != organ:
+            organ=context["diagnostics"][i]["organ"]
+            organ_rowspan=1
+
+            try:
+                if context["diagnostics"][i+1]["organ"] != organ:
+                    context["diagnostics"][i-organ_rowspan+1]["organ_rowspan"] = organ_rowspan
+
+            except IndexError:
+                context["diagnostics"][i-organ_rowspan+1]["organ_rowspan"] = organ_rowspan
+
+        else:
+            organ_rowspan += 1
+
+            try:
+                if context["diagnostics"][i+1]["organ"] != organ:
+                    context["diagnostics"][i-organ_rowspan+1]["organ_rowspan"] = organ_rowspan
+
+            except IndexError:
+                context["diagnostics"][i-organ_rowspan+1]["organ_rowspan"] = organ_rowspan
+
+    for sample in samples:
+        for diagnostics in context["diagnostics"]:
+            if sample.index not in diagnostics["results"]:
+                diagnostics["results"][sample.index] = -1
+
+    for diagnostics in context["diagnostics"]:
+        llaves_ordenadas = sorted(diagnostics["results"].keys())
+        diagnostics["results"] = {k: diagnostics["results"][k] for k in llaves_ordenadas}
+
+    return render(request, "app/consolidados/consolidado_HE/diagnostic_page.html", context)
+
+def template_consolidados_SG_contraportada(request, id):
+
+    #contraportada = "/static/assets/images/contraportada_score_gill.jpg"
+    contraportada = "/static/assets/images/contraportada.jpg"
+
+    context= {
+        "contraportada":contraportada,
+    }
+
+    return render(request, "app/consolidados/contraportada.html",context)
+
+@never_cache
+def download_consolidados_SG(request, id):
+    """Downloads a PDF file for a :model:`backend.Preinvoice` resume"""
+    analysis = Analysis.objects.get(id=id)
+
+    report = AnalysisReport.objects.get(analysis_id=id)
+    no_caso = analysis.entryform.no_caso
+    exam = analysis.exam.abbreviation
+    date = report.report_date.strftime('%d%m%y') if report.report_date != None else " "
+    correlative= "{:02d}".format(report.correlative)
+
+    options = {
+        "quiet": "",
+        "page-size": "letter",
+        "encoding": "UTF-8",
+        "margin-top": "25mm",
+        "margin-left": "5mm",
+        "margin-right": "5mm",
+        "margin-bottom": "20mm",
+        "header-html": "https://storage.googleapis.com/vehice-media/header_HE.html",
+        "header-spacing": 7,
+        "header-font-size": 8,
+        "footer-html": "https://storage.googleapis.com/vehice-media/footer_HE.html",
+        "footer-spacing": 5,
+    }
+
+
+    url = reverse("template_consolidados_SG", kwargs={"id": id})
+    pdf_vertical = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    options["orientation"] = "Landscape"
+    url = reverse("template_consolidados_SG_diagnostic", kwargs={"id": id})
+    pdf_horizontal = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    options = {
+        "quiet": "",
+        "page-size": "letter",
+        "encoding": "UTF-8",
+        "margin-top": "0mm",
+        "margin-left": "0mm",
+        "margin-right": "0mm",
+        "margin-bottom": "0mm",
+    }
+
+    url = reverse("template_consolidados_SG_contraportada", kwargs={"id": id})  ##esta con la normal, poner scoregill
+    pdf_contraportada = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
+
+    pdf_vertical = io.BytesIO(pdf_vertical)
+    pdf_horizontal = io.BytesIO(pdf_horizontal)
+    pdf_contraportada = io.BytesIO(pdf_contraportada)
+
+    pdf_vertical_reader = PdfReader(pdf_vertical)
+    pdf_horizontal_reader = PdfReader(pdf_horizontal)
+    pdf_contraportada_reader = PdfReader(pdf_contraportada)
+    pdf_combinado_writer = PdfWriter()
+
+    index_vertical = 0
+    pagina_vertical = pdf_vertical_reader.pages
+    pdf_combinado_writer.add_page(pagina_vertical[index_vertical])
+
+    if report.methodology != None:
+         index_vertical += 1
+         pdf_combinado_writer.add_page(pagina_vertical[index_vertical])
+
+    for page in pdf_horizontal_reader.pages:
+        pagina_horizontal = page
+        pdf_combinado_writer.add_page(pagina_horizontal)
+
+    index_vertical += 1
+    for page in pdf_vertical_reader.pages[index_vertical:]:
+        pdf_combinado_writer.add_page(page)
+
+    pdf_combinado_writer.add_page(pdf_contraportada_reader.pages[0])
+
+    pdf_combinado = io.BytesIO()
+
+    pdf_combinado_writer.write(pdf_combinado)
+
+    datos_pdf_combinado = pdf_combinado.getvalue()
+
+    pdf_vertical.close()
+    pdf_horizontal.close()
+    pdf_combinado.close()
+
+    if pdf_combinado:
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = "inline;filename=" + f"{no_caso}_{exam}{correlative}_{date}.pdf"
+        response.write(datos_pdf_combinado)
+        return response
+    else:
+        return HttpResponse("Error generating PDF", status=500)
+
 def consolidadoScoreGill(form_id):
 
     context = {
@@ -5326,9 +5709,9 @@ def consolidadoScoreGill(form_id):
     analysis = AnalysisForm.objects.get(id=form_id)
     samples = list(Sample.objects.filter(entryform__id=analysis.entryform.id).order_by("index"))
     list_empty = dict()
-    
+
     entryForm = EntryForm.objects.get(id=analysis.entryform.id)
-    
+
     results= Result.objects.filter(type_result__id__in=[3,4,5,6,7])
     for result in results:
         context[result.name] =  result.id
@@ -5344,7 +5727,7 @@ def consolidadoScoreGill(form_id):
                             "cage": samples[sample].identification.cage,
                         }
                 }
-                
+
                 prom={
                     "identification": {
                             "id": samples[sample].identification.id,
@@ -5379,8 +5762,8 @@ def consolidadoScoreGill(form_id):
             list_empty[f"promedio_center"] = {
                 "center":samples[sample].entryform.center,
                 }
-            list_empty["porcentaje"] = []  
-        
+            list_empty["porcentaje"] = []
+
     identifications = Identification.objects.filter(entryform__id=analysis.entryform.id)
     # Pasar identificaciones a dict con un for
     identifications_list = []
@@ -5390,7 +5773,7 @@ def consolidadoScoreGill(form_id):
             "cage": identification.cage,
         }
         identifications_list.append(identifications_dict)
-    
+
 
     sampleexamresultempty = []
 
@@ -5408,7 +5791,7 @@ def consolidadoScoreGill(form_id):
         result_name = analysisoptionalresult.result.name
     else:
         result_name = "Nombre de resultado no encontrado"
-    
+
 
     context["result_name"] = result_name
     context["analysis"] = analysis
@@ -5418,11 +5801,11 @@ def consolidadoScoreGill(form_id):
     context["sampleexamresults"] = sampleexamresultempty
     print(context["result_name"])
 
-    route = "app/consolidados/consolidado_SG/consolidado_sg.html" 
+    route = "app/consolidados/consolidado_SG/consolidado_sg.html"
     return context, route
 
 def saveConsolidadoScoreGill(request, form_id):
-     
+
     analysis = AnalysisForm.objects.get(id=form_id)
     request = request.POST
     print(request)
@@ -5451,113 +5834,3 @@ def saveConsolidadoScoreGill(request, form_id):
     data = request.POST
     return
     """
-def template_consolidados_SG(request, id):
-    analysis = Analysis.objects.get(id=id)
-
-    analysisSampleExmanResults = AnalysisSampleExmanResult.objects.filter(analysis_id=id)
-    analysisSampleExmanResults = sorted(analysisSampleExmanResults, key=lambda x: x.sample_exam_result.result_organ.organ.name)
-
-    analysis_report = AnalysisReport.objects.get(analysis_id=id)
-
-    if analysis.research_set.all():
-        research = True
-    else:
-        research = False
-
-    no_caso = analysis.entryform.no_caso
-    exam = analysis.exam.abbreviation
-    no_reporte_date = analysis_report.report_date.strftime('%d%m%y')
-    correlative = "{:02d}".format(analysis_report.correlative)
-
-    no_reporte = f'{no_caso}_{exam}{correlative}_{no_reporte_date}'
-
-    identifications = Identification.objects.filter(entryform__no_caso=no_caso)
-
-    identifications_group_empty = True
-    for identification in identifications:
-        if identification.group != "":
-            identifications_group_empty = False
-
-    samples = Sample.objects.filter(
-        entryform=analysis.entryform
-    ).values_list("id", flat=True)
-    sampleExams = SampleExams.objects.filter(
-          sample__in=samples, exam=analysis.exam, stain=analysis.stain
-          )
-    organs_count = samples_count = len(sampleExams)
-    if analysis.exam.pricing_unit == 1:
-            samples_count = organs_count
-    else:
-        sampleExams = SampleExams.objects.filter(
-            sample__in=samples, exam=analysis.exam, stain=analysis.stain
-        ).values_list("sample_id", flat=True)
-        samples_count = len(list(set(sampleExams)))
-
-    sampleExams = SampleExams.objects.filter(sample__in=samples, exam=analysis.exam, stain=analysis.stain)
-    samples=[]
-    identifications_filter = []
-    for sampleExam in sampleExams:
-        sample = Sample.objects.get(id=sampleExam.sample.id)
-
-        identification = identifications.filter(id=sample.identification.id)[0]
-        if identification not in identifications_filter and not any(iden.cage == identification.cage and iden.weight == identification.weight for iden in identifications_filter):
-            identifications_filter.append(identification)
-
-        if sample not in samples:
-            samples.append(sample)
-
-    samples = sorted(samples, key=lambda x: x.index)
-
-    sample_charge = analysis.samples_charged if analysis.samples_charged != None and analysis.samples_charged > 0 else  samples_count
-
-    reportImages = analysis_report.reportimages_set.all().order_by('index')
-
-    pathologist = ""
-    if analysis.patologo:
-        pathologist = f"{analysis.patologo.first_name} {analysis.patologo.last_name}"
-
-    if analysis_report.methodology != None:
-
-        methodology = {
-            "id":analysis_report.methodology.id,
-            "name":analysis_report.methodology.name,
-            "description":analysis_report.methodology.description,
-            "image":[],
-        }
-
-        for image in MethodologyImage.objects.filter(methodology=analysis_report.methodology).order_by("index"):
-            methodology_image = {
-                "id":image.id,
-                "comment":image.comment,
-                "size":image.size,
-                "url":image.imagen.url
-            }
-            methodology["image"].append(methodology_image)
-    else:
-        methodology = ""
-
-    context = {
-        "no_caso": no_caso,
-        "no_reporte": no_reporte,
-        "research": research,
-        "pathologist": pathologist,
-        "customer": analysis.entryform.customer.name,
-        "center": analysis.entryform.center,
-        "specie": analysis.entryform.specie.name,
-        "larvalstage": analysis.entryform.larvalstage.name,
-        "watersource": analysis.entryform.watersource.name,
-        "identifications": identifications_filter,
-        "identifications_group_empty":identifications_group_empty,
-        "fecha_recepcion": analysis.created_at.strftime('%d-%m-%Y'),
-        "fecha_informe": analysis_report.report_date.strftime('%d-%m-%Y'),
-        "fecha_muestreo": analysis.entryform.sampled_at.strftime('%d-%m-%Y') if analysis.entryform.sampled_at != None else "-",
-        "sample_charge": f'{sample_charge} {analysis.exam.name}',
-        "anamnesis": analysis_report.anamnesis,
-        "comment": analysis_report.comment,
-        "etiological_diagnostic": analysis_report.etiological_diagnostic,
-        "samples":samples,
-        "reportImages": reportImages,
-        "methodology":methodology,
-    }
-
-    return render(request, "app/consolidados/consolidado_HE/template_consolidado_SG.html", context)
