@@ -11,6 +11,9 @@ import pdfkit
 import os
 import subprocess
 
+
+from django.core.cache import cache
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core import mail
@@ -39,6 +42,13 @@ from workflows.models import *
 from lab.models import Analysis, Cassette as LabCassette, CassetteOrgan as LabCassetteOrgan
 from smtplib import SMTPException
 from datetime import date
+
+#para img file
+from django.core.files.base import ContentFile
+import base64
+
+#render para imagenes
+from django.template.loader import render_to_string
 
 # from utils import functions as fn
 
@@ -4939,6 +4949,8 @@ def template_consolidados_HE(request, id):
     analysisSampleExmanResults = AnalysisSampleExmanResult.objects.filter(analysis_id=id)
     analysisSampleExmanResults = sorted(analysisSampleExmanResults, key=lambda x: x.sample_exam_result.result_organ.organ.name)
 
+    print("id_he",id)
+
     analysis_report = AnalysisReport.objects.get(analysis_id=id)
 
     if analysis.research_set.all():
@@ -4993,6 +5005,8 @@ def template_consolidados_HE(request, id):
     sample_charge = analysis.samples_charged if analysis.samples_charged != None and analysis.samples_charged > 0 else  samples_count
 
     reportImages = analysis_report.reportimages_set.all().order_by('index')
+
+    print("reportImages",reportImages)
 
     pathologist = ""
     if analysis.patologo:
@@ -5334,10 +5348,10 @@ def template_consolidados_SG(request, id):
 
     no_caso = analysis.entryform.no_caso
     exam = analysis.exam.abbreviation
-    #no_reporte_date = analysis_report.report_date.strftime('%d%m%y')
+    no_reporte_date = analysis_report.report_date.strftime('%d-%m-%Y')
     correlative = "{:02d}".format(analysis_report.correlative)
 
-    #no_reporte = f'{no_caso}_{exam}{correlative}_{no_reporte_date}'
+    no_reporte = f'{no_caso}_{exam}{correlative}_{no_reporte_date}'
     identifications = Identification.objects.filter(entryform__no_caso=no_caso)
 
     identifications_group_empty = True
@@ -5380,12 +5394,11 @@ def template_consolidados_SG(request, id):
 
     reportImages = analysis_report.reportimages_set.all().order_by('index')
 
+    print("reportImages",reportImages)
+
     pathologist = ""
     if analysis.patologo:
         pathologist = f"{analysis.patologo.first_name} {analysis.patologo.last_name}"
-
-
-
 
     if analysis_report.methodology != None:
 
@@ -5409,7 +5422,7 @@ def template_consolidados_SG(request, id):
 
     context = {
         "no_caso": no_caso,
-        #"no_reporte": no_reporte,
+        "no_reporte": no_reporte,
         "research": research,
         "pathologist": pathologist,
         "customer": analysis.entryform.customer.name,
@@ -5419,20 +5432,20 @@ def template_consolidados_SG(request, id):
         "watersource": analysis.entryform.watersource.name,
         "identifications": identifications_filter,
         "identifications_group_empty":identifications_group_empty,
-        #"fecha_recepcion": analysis.created_at.strftime('%d-%m-%Y'),
-        #"fecha_informe": analysis_report.report_date.strftime('%d-%m-%Y'),
-        #"fecha_muestreo": analysis.entryform.sampled_at.strftime('%d-%m-%Y') if analysis.entryform.sampled_at != None else "-",
+        "fecha_recepcion": analysis.created_at.strftime('%d-%m-%Y'),
+        "fecha_informe": analysis_report.report_date.strftime('%d-%m-%Y'),
+        "fecha_muestreo": analysis.entryform.sampled_at.strftime('%d-%m-%Y') if analysis.entryform.sampled_at != None else "-",
         "sample_charge": f'{sample_charge} {analysis.exam.name}',
         "anamnesis": analysis_report.anamnesis,
         "comment": analysis_report.comment,
         "etiological_diagnostic": analysis_report.etiological_diagnostic,
         "samples":samples,
-        "reportImages": reportImages,
+        #"reportImages": reportImages,
         "methodology":methodology,
     }
 
 
-    return render(request, "app/consolidados/consolidado_SG/template_consolidado_SG.html")
+    return render(request, "app/consolidados/consolidado_SG/template_consolidado_SG.html", context)
 
 def template_consolidados_SG_diagnostic(request, id):
     analysis = Analysis.objects.get(id=id)
@@ -5606,10 +5619,32 @@ def template_consolidados_SG_contraportada(request, id):
 
     return render(request, "app/consolidados/contraportada.html",context)
 
+#def template_consolidados_SG_graphs(request, id):
+#
+#
+#    context = {
+#        # Your existing context data here
+#        'graph_image_data': graph_image_data,
+#    }
+
+ #   return render(request, "app\consolidados\consolidado_SG\consolidado_graphs.html",context)
+
 @never_cache
 def download_consolidados_SG(request, id):
     """Downloads a PDF file for a :model:`backend.Preinvoice` resume"""
+
     analysis = Analysis.objects.get(id=id)
+    #print(request.FILES)  # Debugging: Check the received files
+
+    chart_images_base64 = {}
+    for chart_id in ['myChart', 'myMixedChart', 'myMixedChart2', 'myBoxChart']:
+        chart_image_file = request.FILES.get(chart_id, None)
+        if chart_image_file:
+            chart_image_data = chart_image_file.read()
+            chart_images_base64[chart_id] = base64.b64encode(chart_image_data).decode('utf-8')
+        else:
+            print(f"No image file received for {chart_id}")
+
 
     report = AnalysisReport.objects.get(analysis_id=id)
     no_caso = analysis.entryform.no_caso
@@ -5650,16 +5685,34 @@ def download_consolidados_SG(request, id):
         "margin-bottom": "0mm",
     }
 
+
+    # CHARTS TO PDF
+    graph_html_content = render_to_string(
+        "app/consolidados/consolidado_SG/consolidado_graphs.html",
+        {'chart_images': chart_images_base64}
+    )
+    pdf_graph_section = pdfkit.from_string(graph_html_content, False, options=options)
+
     url = reverse("template_consolidados_SG_contraportada", kwargs={"id": id})  ##esta con la normal, poner scoregill
     pdf_contraportada = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
 
+
+    # Convert the PDF outputs from pdfkit to BytesIO objects
+
     pdf_vertical = io.BytesIO(pdf_vertical)
     pdf_horizontal = io.BytesIO(pdf_horizontal)
+    pdf_graph_section = io.BytesIO(pdf_graph_section)
     pdf_contraportada = io.BytesIO(pdf_contraportada)
+
+
+    # Initialize PdfReader objects for each PDF section
 
     pdf_vertical_reader = PdfReader(pdf_vertical)
     pdf_horizontal_reader = PdfReader(pdf_horizontal)
     pdf_contraportada_reader = PdfReader(pdf_contraportada)
+    pdf_graph_section_reader = PdfReader(pdf_graph_section)
+
+    # Initialize a PdfWriter for the combined PDF
     pdf_combinado_writer = PdfWriter()
 
     index_vertical = 0
@@ -5673,6 +5726,11 @@ def download_consolidados_SG(request, id):
     for page in pdf_horizontal_reader.pages:
         pagina_horizontal = page
         pdf_combinado_writer.add_page(pagina_horizontal)
+
+    # Add the graph section
+    # Assuming the graph section is a single page. If more, loop through reader_graph_section.pages
+    for page in pdf_graph_section_reader.pages:
+        pdf_combinado_writer.add_page(page)
 
     index_vertical += 1
     for page in pdf_vertical_reader.pages[index_vertical:]:
@@ -5689,6 +5747,8 @@ def download_consolidados_SG(request, id):
     pdf_vertical.close()
     pdf_horizontal.close()
     pdf_combinado.close()
+    pdf_contraportada.close()
+    pdf_graph_section.close()
 
     if pdf_combinado:
         response = HttpResponse(content_type="application/pdf")
@@ -5834,3 +5894,19 @@ def saveConsolidadoScoreGill(request, form_id):
     data = request.POST
     return
     """
+
+# FOR DEBUG
+
+
+
+def debug_view(request):
+    # This line captures all the keys from the POST request
+    post_keys = request.POST.keys()
+
+    # Passing the keys to the context
+    context = {
+        'post_keys': post_keys,
+    }
+
+    # Rendering the template with the context
+    return render(request, 'debug_template.html', context)

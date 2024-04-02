@@ -185,9 +185,7 @@ function generateChartProms(data, labels, centerAverage, centerName) {
         color: '#444', // Set the color of the datalabels
         anchor: 'end', // Anchor the labels to the end of the bars
         align: 'top', // Align the labels to the top of the bars
-        formatter: (value, context) => {
-          return value.toFixed(1); // Format the value to one decimal place
-        }
+        formatter: (value) => value.toFixed(1)
       },
       legend: {
         display: true,
@@ -315,6 +313,20 @@ function generateChartProms(data, labels, centerAverage, centerName) {
     },
   };
 
+
+  // Define a beforeDraw plugin directly within the function
+  const beforeDrawPlugin = {
+    id: 'beforeDrawBackground',
+    beforeDraw: (chart) => {
+      const ctx = chart.ctx;
+      const chartArea = chart.chartArea;
+      ctx.save();
+      ctx.fillStyle = 'white';
+      ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+      ctx.restore();
+    }
+  };
+
   // If the chart instance already exists, update its data and labels
   if (window.myChart instanceof Chart) {
     window.myChart.options = chartOptions; // Make sure to update the options
@@ -336,7 +348,9 @@ function generateChartProms(data, labels, centerAverage, centerName) {
                   borderWidth: 1
               }]
           },
-          options: chartOptions
+          options: chartOptions,
+          plugins: [beforeDrawPlugin] // Add the beforeDraw plugin here
+
       });
   }
 }
@@ -1376,12 +1390,44 @@ function addImage(id, data) {
   });
 }
 //guardar informacion del informe y generar informe
-$("#report_edit").on("submit", async function (event) {
-  var id = window.location.pathname.split("/")[2];
+/*$("#report_edit").on("submit", async function (event) {
   event.preventDefault();
+
+
+
+
+
+  const canvasBarChart = document.getElementById('myChart');
+  //create image
+  const canvasBarChartImage = canvasBarChart.toDataURL('image/jpeg', 1.0);
+
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = Urls.download_consolidados_SG(id);
+  form.target = '_blank'; // Open in new tab
+
+  // Append your data as hidden inputs
+  const hiddenField = document.createElement('input');
+  hiddenField.type = 'hidden';
+  hiddenField.name = 'graphImage';
+  hiddenField.value = canvasBarChartImage;
+  form.appendChild(hiddenField);
+
+  // Append more fields as needed...
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+
+
+  dataForm.append("graphImage", canvasBarChartImage);
+
 
   const dataForm = new FormData(this);
   dataForm.delete("methodology");
+
+  //verificado que agrega
   if (checkimagesfile() && checkForm()) {
     await $.ajax({
       url: Urls.analysisReport_save(id),
@@ -1400,9 +1446,82 @@ $("#report_edit").on("submit", async function (event) {
   } else {
     toastr.warning("Se necesitan llenar todos los campos");
   }
+});*/
+
+$("#report_edit").on("submit", async function (event) {
+  event.preventDefault();
+
+  // Perform verification checks
+  if (checkimagesfile() && checkForm()) {
+    //const canvasBarChart = document.getElementById('myChart');
+    // Create image
+    //const canvasBarChartImage = canvasBarChart.toDataURL('image/png');
+
+
+    // Convert Base64 image to a Blob
+    //const blob = await (await fetch(canvasBarChartImage)).blob();
+
+    var id = window.location.pathname.split("/")[2];
+    const dataForm = new FormData(this);
+
+
+    // Get all canvas elements
+    const charts = ['myChart', 'myMixedChart', 'myMixedChart2', 'myBoxChart'];
+
+
+    // Loop through each chart, convert to image, and append to FormData
+    for (const chartId of charts) {
+      const canvas = document.getElementById(chartId);
+      if (canvas) {
+        const canvasImage = canvas.toDataURL('image/png');
+        const blob = await (await fetch(canvasImage)).blob();
+        dataForm.append(chartId, blob, chartId + ".png");
+      }
+    }
+
+    //dataForm.append("graphImage", blob, "graph.png");
+
+    dataForm.delete("methodology"); // Adjust according to your needs
+
+
+    try {
+      // Assuming you want to generate and download the PDF directly
+      const response = await $.ajax({
+        url: Urls.download_consolidados_SG(id), // Make sure this points to the PDF generation endpoint
+        method: "POST",
+        processData: false,
+        contentType: false,
+        data: dataForm,
+        xhrFields: {
+          responseType: 'blob' // Expect a blob response to handle the PDF download
+        },
+        success: function(data) {
+          // Create a URL for the blob
+          const url = window.URL.createObjectURL(new Blob([data]));
+          // Create a link to download it
+          const downloadLink = document.createElement('a');
+          downloadLink.href = url;
+          downloadLink.setAttribute('download', 'report.pdf'); // Name the download file
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        },
+        error: function(xhr, status, error) {
+          console.error("Error generating PDF:", error);
+          toastr.warning("Error occurred. Please try again.");
+        }
+      });
+    } catch (error) {
+      console.error("Error in AJAX request:", error);
+      toastr.warning("Error occurred. Please try again.");
+    }
+  } else {
+    toastr.warning("Se necesitan llenar todos los campos");
+  }
 });
 
 //Funcion para eliminar la imagen seleccionada
+
 function deleteImage(id) {
   images = document.getElementById("images").children;
   new_order = [];
@@ -1657,6 +1776,7 @@ function methodologyImageTemplate(methodology) {
 }
 
 function saveMethodology(id) {
+
   methodology_div = document.getElementById(`methodology-${id}`);
   methodology_data = methodology_div.querySelectorAll("[name]");
 
