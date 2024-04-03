@@ -5619,19 +5619,17 @@ def template_consolidados_SG_contraportada(request, id):
 
     return render(request, "app/consolidados/contraportada.html",context)
 
-#def template_consolidados_SG_graphs(request, id):
-#
-#
-#    context = {
-#        # Your existing context data here
-#        'graph_image_data': graph_image_data,
-#    }
-
- #   return render(request, "app\consolidados\consolidado_SG\consolidado_graphs.html",context)
-
 @never_cache
 def download_consolidados_SG(request, id):
     """Downloads a PDF file for a :model:`backend.Preinvoice` resume"""
+
+    # Inside your download_consolidados_SG view
+    table_html1 = request.POST.get('tableHTML1', '')
+    table_html2 = request.POST.get('tableHTML2', '')
+
+    print(table_html1,"TABLE1")
+    print(table_html2,"TABLE2")
+
 
     analysis = Analysis.objects.get(id=id)
     #print(request.FILES)  # Debugging: Check the received files
@@ -5675,6 +5673,33 @@ def download_consolidados_SG(request, id):
     url = reverse("template_consolidados_SG_diagnostic", kwargs={"id": id})
     pdf_horizontal = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
 
+    # Set the options for the graph section with appropriate margins
+    options = {
+        "quiet": "",
+        "page-size": "letter",
+        "encoding": "UTF-8",
+        "margin-top": "25mm",  # Adjust this value as needed
+        "margin-left": "5mm",
+        "margin-right": "5mm",
+        "margin-bottom": "20mm",
+    # Include any other necessary options here
+}
+
+    context = {
+        'chart_images': chart_images_base64,
+        'table_html1': table_html1,
+        'table_html2': table_html2,
+        # Include other context variables as needed
+    }
+
+    # CHARTS TO PDF
+    graph_html_content = render_to_string(
+        "app/consolidados/consolidado_SG/consolidado_graphs.html",
+        context
+    )
+    pdf_graph_section = pdfkit.from_string(graph_html_content, False, options=options)
+
+
     options = {
         "quiet": "",
         "page-size": "letter",
@@ -5684,14 +5709,6 @@ def download_consolidados_SG(request, id):
         "margin-right": "0mm",
         "margin-bottom": "0mm",
     }
-
-
-    # CHARTS TO PDF
-    graph_html_content = render_to_string(
-        "app/consolidados/consolidado_SG/consolidado_graphs.html",
-        {'chart_images': chart_images_base64}
-    )
-    pdf_graph_section = pdfkit.from_string(graph_html_content, False, options=options)
 
     url = reverse("template_consolidados_SG_contraportada", kwargs={"id": id})  ##esta con la normal, poner scoregill
     pdf_contraportada = pdfkit.from_url(settings.SITE_URL + url, False, options=options)
@@ -5896,9 +5913,6 @@ def saveConsolidadoScoreGill(request, form_id):
     """
 
 # FOR DEBUG
-
-
-
 def debug_view(request):
     # This line captures all the keys from the POST request
     post_keys = request.POST.keys()

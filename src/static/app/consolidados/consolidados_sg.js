@@ -1389,81 +1389,23 @@ function addImage(id, data) {
     ],
   });
 }
-//guardar informacion del informe y generar informe
-/*$("#report_edit").on("submit", async function (event) {
-  event.preventDefault();
-
-
-
-
-
-  const canvasBarChart = document.getElementById('myChart');
-  //create image
-  const canvasBarChartImage = canvasBarChart.toDataURL('image/jpeg', 1.0);
-
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = Urls.download_consolidados_SG(id);
-  form.target = '_blank'; // Open in new tab
-
-  // Append your data as hidden inputs
-  const hiddenField = document.createElement('input');
-  hiddenField.type = 'hidden';
-  hiddenField.name = 'graphImage';
-  hiddenField.value = canvasBarChartImage;
-  form.appendChild(hiddenField);
-
-  // Append more fields as needed...
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-
-
-
-  dataForm.append("graphImage", canvasBarChartImage);
-
-
-  const dataForm = new FormData(this);
-  dataForm.delete("methodology");
-
-  //verificado que agrega
-  if (checkimagesfile() && checkForm()) {
-    await $.ajax({
-      url: Urls.analysisReport_save(id),
-      method: "POST",
-      dataType: "json",
-      data: dataForm,
-      processData: false,
-      contentType: false,
-      success: function (data) {
-        window.open(Urls.download_consolidados_SG(id), "_blank");
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error(errorThrown);
-      },
-    });
-  } else {
-    toastr.warning("Se necesitan llenar todos los campos");
-  }
-});*/
 
 $("#report_edit").on("submit", async function (event) {
   event.preventDefault();
 
   // Perform verification checks
   if (checkimagesfile() && checkForm()) {
-    //const canvasBarChart = document.getElementById('myChart');
-    // Create image
-    //const canvasBarChartImage = canvasBarChart.toDataURL('image/png');
-
-
-    // Convert Base64 image to a Blob
-    //const blob = await (await fetch(canvasBarChartImage)).blob();
 
     var id = window.location.pathname.split("/")[2];
     const dataForm = new FormData(this);
 
+    // Right before the AJAX request in your submit event handler
+    const tableHTML1 = document.getElementById('chartDataTable').innerHTML;
+    const tableHTML2 = document.getElementById('chartDataTable2').innerHTML;
+
+    // Append the table HTML to the FormData object
+    dataForm.append('tableHTML1', tableHTML1);
+    dataForm.append('tableHTML2', tableHTML2);
 
     // Get all canvas elements
     const charts = ['myChart', 'myMixedChart', 'myMixedChart2', 'myBoxChart'];
@@ -1497,14 +1439,9 @@ $("#report_edit").on("submit", async function (event) {
         },
         success: function(data) {
           // Create a URL for the blob
-          const url = window.URL.createObjectURL(new Blob([data]));
-          // Create a link to download it
-          const downloadLink = document.createElement('a');
-          downloadLink.href = url;
-          downloadLink.setAttribute('download', 'report.pdf'); // Name the download file
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
+          const url = window.URL.createObjectURL(new Blob([data], {type: 'application/pdf'}));
+          // Open the PDF in a new tab
+          window.open(url, '_blank');
         },
         error: function(xhr, status, error) {
           console.error("Error generating PDF:", error);

@@ -1,30 +1,51 @@
 <style>
+
+  #layout-container .pagerect {
+    margin-top: 40px !important; /* Add space at the top of each page */
+  }
+
   .chart-container {
-    padding: 20px; /* Adjust padding as needed */
-    border: 2px solid #ccc; /* Increased border width for better visibility */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: adds shadow for depth */
-    margin-top: 40px; /* Increased space at the top */
+    padding: 20px;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px; /* Space at the top of each chart container */
     margin-bottom: 20px; /* Space between charts */
-    background: #fff; /* Optional: sets a background color */
-    border-radius: 10px; /* Optional: rounds corners */
-    max-width: 800px; /* Maximum width of charts */
-    min-height: 300px; /* Minimum height of charts */
-    margin-left: auto; /* Center the chart containers */
-    margin-right: auto; /* Center the chart containers */
+    background: #fff;
+    border-radius: 10px;
+    max-width: 800px;
+    min-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .responsive-image {
-    width: 100%; /* Full width of the parent container */
-    height: auto; /* Maintain aspect ratio */
-    display: block; /* Prevent inline spacing issues */
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .custom-page-style {
+    margin-top: 40px; /* Add space at the top of each page */
   }
 </style>
+
+
+
 {% if chart_images %}
-  <!-- Loop through each chart image and wrap each in its own container -->
   {% for chart_id, chart_image_base64 in chart_images.items %}
     <div class="chart-container">
       <img class="responsive-image" src="data:image/png;base64,{{ chart_image_base64 }}" alt="{{ chart_id }}">
     </div>
+    {% if forloop.counter == 2 %}
+      <!-- Render table_html1 below the first chart -->
+      <div class="chart-table-container">
+        {{ table_html1|safe }}
+      </div>
+    {% elif forloop.counter == 3 %}
+      <!-- Render table_html2 below the second chart -->
+      <div class="chart-table-container">
+        {{ table_html2|safe }}
+      </div>
+    {% endif %}
   {% endfor %}
 {% else %}
   <div>Debug: No image data available</div>
