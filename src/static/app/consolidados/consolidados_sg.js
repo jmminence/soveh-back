@@ -1390,6 +1390,35 @@ function addImage(id, data) {
   });
 }
 
+/*
+$("#report_edit").on("submit", async function (event) {
+  var id = window.location.pathname.split("/")[2];
+  event.preventDefault();
+
+  const dataForm = new FormData(this);
+  dataForm.delete("methodology");
+  if (checkimagesfile() && checkForm()) {
+    await $.ajax({
+      url: Urls.analysisReport_save(id),
+      method: "POST",
+      dataType: "json",
+      data: dataForm,
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        window.open(Urls.download_consolidados_HE(id), "_blank");
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error(errorThrown);
+      },
+    });
+  } else {
+    toastr.warning("Se necesitan llenar todos los campos");
+  }
+});
+*/
+
+
 $("#report_edit").on("submit", async function (event) {
   event.preventDefault();
 

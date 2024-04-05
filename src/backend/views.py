@@ -4949,7 +4949,6 @@ def template_consolidados_HE(request, id):
     analysisSampleExmanResults = AnalysisSampleExmanResult.objects.filter(analysis_id=id)
     analysisSampleExmanResults = sorted(analysisSampleExmanResults, key=lambda x: x.sample_exam_result.result_organ.organ.name)
 
-    print("id_he",id)
 
     analysis_report = AnalysisReport.objects.get(analysis_id=id)
 
@@ -4965,7 +4964,7 @@ def template_consolidados_HE(request, id):
 
     no_reporte = f'{no_caso}_{exam}{correlative}_{no_reporte_date}'
 
-    identifications = Identification.objects.filter(entryform__no_caso=no_caso)
+    identifications = Identification.objects.filter(entryform__no_caso=no_caso).exclude(cage="Muestreo")
 
     identifications_group_empty = True
     for identification in identifications:
@@ -5006,7 +5005,7 @@ def template_consolidados_HE(request, id):
 
     reportImages = analysis_report.reportimages_set.all().order_by('index')
 
-    print("reportImages",reportImages)
+    print("reportImagesdd",reportImages)
 
     pathologist = ""
     if analysis.patologo:
@@ -5253,7 +5252,7 @@ def download_consolidados_HE(request, id):
     correlative= "{:02d}".format(report.correlative)
 
     options = {
-        "quiet": "",
+        "quiet": False,
         "page-size": "letter",
         "encoding": "UTF-8",
         "margin-top": "25mm",
@@ -5330,6 +5329,9 @@ def download_consolidados_HE(request, id):
 
     return response
 
+    def template_consolidados_score_gill(request, id):
+        pass
+
 #SCOREGILL
 
 def template_consolidados_SG(request, id):
@@ -5396,6 +5398,7 @@ def template_consolidados_SG(request, id):
 
     print("reportImages",reportImages)
 
+
     pathologist = ""
     if analysis.patologo:
         pathologist = f"{analysis.patologo.first_name} {analysis.patologo.last_name}"
@@ -5440,7 +5443,7 @@ def template_consolidados_SG(request, id):
         "comment": analysis_report.comment,
         "etiological_diagnostic": analysis_report.etiological_diagnostic,
         "samples":samples,
-        #"reportImages": reportImages,
+        "reportImages": reportImages,
         "methodology":methodology,
     }
 

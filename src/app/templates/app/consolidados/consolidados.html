@@ -15,7 +15,7 @@
     table tbody {
         width: 100%;
     }
-    
+
     table{
         margin-top: 20px;
     }
@@ -84,7 +84,7 @@
     .modal {
         overflow-y:auto;
       }
-    
+
 </style>
 
 {% endblock stylesheets %}
@@ -222,7 +222,7 @@
                         </div>
                         <div id="images" class="reportSortable">
                         </div>
-                        
+
                         <div class="form-group">
                             <button id="addImage" type="button" class="btn btn-outline-primary btn-lg btn-block">Añadir una imagen</button>
                         </div>
@@ -234,7 +234,7 @@
                 </div>
             </div>
         </form>
-        
+
         <div class="modal fade text-left" id="methodology_modal" role="dialog" data-keyboard="false">
             <div class="modal-dialog" role="document" style="min-width:50% !important;">
                 <div class="modal-content">
@@ -255,9 +255,9 @@
                 </div>
             </div>
         </div>
-        
+
     {% endif %}
-    
+
 {% endblock content %}
 
 {% block scripts %}
@@ -291,7 +291,7 @@
             ['color', ['color']],
           ]
           });
-        
+
         $('#anamnesis').summernote({
             height: 120,
             lang: 'es-ES',
@@ -312,7 +312,7 @@
           ]
         });
 
-        
+
         if("{{diagnosticos}}" != "[]"){
             identificationsTable({{samples}});
         }

@@ -5,27 +5,49 @@
   }
 
   .chart-container {
+    max-width: 800px; /* Adjust this value to match the width of your chart */
+    margin: 20px auto; /* Centers the container */
     padding: 20px;
     border: 2px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px; /* Space at the top of each chart container */
-    margin-bottom: 20px; /* Space between charts */
     background: #fff;
     border-radius: 10px;
-    max-width: 800px;
-    min-height: 300px;
-    margin-left: auto;
-    margin-right: auto;
   }
 
+  .data-table-container {
+    max-width: 100%; /* Use the full width of the page */
+    margin: 0 auto; /* Centers the container */
+  }
+
+
+  .data-table-container table {
+    width: 100%; /* Make the table use the full width of its container */
+    margin-top: 20px; /* Space between the chart and the table */
+    border-collapse: collapse;
+    font-size: 10px; /* Smaller font size to fit more content */
+  }
   .responsive-image {
     width: 100%;
     height: auto;
     display: block;
   }
-  .custom-page-style {
-    margin-top: 40px; /* Add space at the top of each page */
+
+  .data-table-container th, .data-table-container td {
+    border: 1px solid #ddd;
+    padding: 4px; /* Reduced padding */
+    text-align: center;
   }
+
+
+  .data-table-container tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .data-table-container th {
+    background-color: #4CAF50;
+    color: white;
+  }
+
 </style>
 
 
@@ -37,12 +59,12 @@
     </div>
     {% if forloop.counter == 2 %}
       <!-- Render table_html1 below the first chart -->
-      <div class="chart-table-container">
+      <div class="data-table-container">
         {{ table_html1|safe }}
       </div>
     {% elif forloop.counter == 3 %}
       <!-- Render table_html2 below the second chart -->
-      <div class="chart-table-container">
+      <div class="data-table-container">
         {{ table_html2|safe }}
       </div>
     {% endif %}
